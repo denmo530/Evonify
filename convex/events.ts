@@ -3,6 +3,15 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getUser } from "./users";
 
+export const generateUploadUrl = mutation(async (ctx) => {
+  const identity = await ctx.auth.getUserIdentity();
+
+  if (!identity)
+    throw new ConvexError("You must be logged in to create an event.");
+
+  return await ctx.storage.generateUploadUrl();
+});
+
 async function hasAccessToOrg(
   ctx: QueryCtx | MutationCtx,
   tokenIdentifier: string,
@@ -20,6 +29,10 @@ export const createEvent = mutation({
   args: {
     name: v.string(),
     orgId: v.string(),
+    location: v.string(),
+    date: v.string(),
+    description: v.string(),
+    imgId: v.id("_storage"),
   },
   async handler(ctx, args) {
     const identity = await ctx.auth.getUserIdentity();
@@ -39,6 +52,10 @@ export const createEvent = mutation({
     await ctx.db.insert("events", {
       name: args.name,
       orgId: args.orgId,
+      location: args.location,
+      date: args.date,
+      description: args.description,
+      imgId: args.imgId,
     });
   },
 });

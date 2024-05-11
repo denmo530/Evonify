@@ -5,6 +5,10 @@ export default defineSchema({
   events: defineTable({
     name: v.string(),
     orgId: v.string(),
+    location: v.string(),
+    date: v.string(),
+    description: v.string(),
+    imgId: v.id("_storage"),
   }).index("by_orgId", ["orgId"]),
   users: defineTable({
     tokenIdentifier: v.string(),
