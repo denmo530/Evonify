@@ -86,3 +86,27 @@ export const getEvents = query({
     return events;
   },
 });
+
+export const deleteEvent = mutation({
+  args: { eventId: v.id("events") },
+  async handler(ctx, args) {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity)
+      throw new ConvexError("You must be logged in to create an event.");
+
+    const event = await ctx.db.get(args.eventId);
+
+    if (!event) throw new ConvexError("event does not exist.");
+
+    const hasAccess = await hasAccessToOrg(
+      ctx,
+      identity.tokenIdentifier,
+      event.orgId
+    );
+
+    if (!hasAccess) throw new ConvexError("you do not have access to event.");
+
+    await ctx.db.delete(args.eventId);
+  },
+});
