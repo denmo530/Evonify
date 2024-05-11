@@ -16,10 +16,6 @@ export default function Home() {
         </p>
       </section>
       <section>
-        {
-          // TODO: Should open up a form or just enter number/email in field and
-        }{" "}
-        get subsribed to mailing list.
         <Button className="flex gap-2">
           <BellRing size={18} />
           Subscribe to mailing list.
