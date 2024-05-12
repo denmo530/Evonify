@@ -250,9 +250,9 @@ export default function CreateButton() {
                 <Button
                   className="flex gap-2 "
                   type="submit"
-                  disabled={form.formState.isLoading}
+                  disabled={form.formState.isSubmitting}
                 >
-                  {form.formState.isLoading && (
+                  {form.formState.isSubmitting && (
                     <Loader2 className="animate-spin h-4 w-4" />
                   )}
                   Create

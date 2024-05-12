@@ -123,6 +123,9 @@ export default function EventCard({
         </div>
       </CardContent>
       <CardFooter>
+        {
+          // Todo: Send notification dialog. Only for premium users
+        }
         <Button>Send Notification</Button>
       </CardFooter>
     </Card>

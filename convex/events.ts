@@ -63,6 +63,7 @@ export const createEvent = mutation({
 export const getEvents = query({
   args: {
     orgId: v.string(),
+    query: v.optional(v.string()),
   },
   async handler(ctx, args) {
     const identity = await ctx.auth.getUserIdentity();
@@ -90,7 +91,13 @@ export const getEvents = query({
       }))
     );
 
-    return eventsWithUrl;
+    const query = args.query;
+
+    if (!query) return eventsWithUrl;
+
+    return eventsWithUrl.filter((event) =>
+      event.name.toLowerCase().includes(query.toLowerCase())
+    );
   },
 });
 
