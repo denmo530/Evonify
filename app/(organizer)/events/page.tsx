@@ -23,6 +23,11 @@ export default function Events() {
 
   const isLoading = events === undefined;
 
+  const orgName =
+    organization.organization?.name ??
+    user.user?.username ??
+    user.user?.primaryEmailAddress?.emailAddress;
+
   return (
     <main className="container mx-auto pt-12">
       {isLoading && (
@@ -49,10 +54,18 @@ export default function Events() {
       {events && events.length > 0 && (
         <>
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold">Your Events</h1>
+            <div className="space-y-1">
+              <h1 className="text-4xl font-bold">Your Events</h1>
+              <div className="text-muted-foreground text-sm px-2">
+                Organization{" "}
+                <span className="text-[#D4145A]">
+                  {orgName?.toLocaleUpperCase()}
+                </span>
+              </div>
+            </div>
             <CreateButton />
           </div>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             {events?.map((event) => (
               <EventCard key={event._id} event={event} />
             ))}

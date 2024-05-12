@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 
 import {
   Card,
@@ -36,6 +36,7 @@ import { MoreVertical, TrashIcon } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useToast } from "@/components/ui/use-toast";
+import Image from "next/image";
 
 function EventCardActions({ event }: { event: Doc<"events"> }) {
   const deleteEvent = useMutation(api.events.deleteEvent);
@@ -95,20 +96,31 @@ function EventCardActions({ event }: { event: Doc<"events"> }) {
   );
 }
 
-export default function EventCard({ event }: { event: Doc<"events"> }) {
+export default function EventCard({
+  event,
+}: {
+  event: Doc<"events"> & { url: string | null };
+}) {
   return (
     <Card>
-      <CardHeader className="relative">
-        <CardTitle>{event.name}</CardTitle>
+      <CardHeader className="relative mb-4 ">
+        {event.url && (
+          <div className="overflow-hidden h-16">
+            <Image alt={event.name} fill objectFit="cover" src={event.url} />
+          </div>
+        )}
+        {/* <CardDescription>{event.description}</CardDescription> */}
+      </CardHeader>
+      <CardContent className="space-y-2 prose relative">
         <div className="absolute top-2 right-2">
           <EventCardActions event={event} />
         </div>
-        {/* <CardDescription>{event.description}</CardDescription> */}
-      </CardHeader>
-      <CardContent>
-        <p>{event.description}</p>
-        <p>{event.date}</p>
-        <p>{event.location}</p>
+        <CardTitle className="text-lg">{event.name}</CardTitle>
+        <div className="text-sm">
+          <p>{event.description}</p>
+          <p>{event.date}</p>
+          <p>{event.location}</p>
+        </div>
       </CardContent>
       <CardFooter>
         <Button>Send Notification</Button>

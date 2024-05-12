@@ -83,7 +83,14 @@ export const getEvents = query({
       .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
       .collect();
 
-    return events;
+    const eventsWithUrl = await Promise.all(
+      events.map(async (event) => ({
+        ...event,
+        url: await ctx.storage.getUrl(event.imgId),
+      }))
+    );
+
+    return eventsWithUrl;
   },
 });
 
