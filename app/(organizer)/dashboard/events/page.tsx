@@ -10,6 +10,7 @@ import EventCard from "../_components/event-card";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { SearchBar } from "../_components/search-bar";
+import Link from "next/link";
 
 function Placeholder() {
   return (
@@ -59,6 +60,10 @@ export default function Events() {
           <div className="text-xl">Loading your events...</div>
         </div>
       )}
+
+      <div>
+        <Link href={`/subscribe/${orgId}`}>Link to subscription page</Link>
+      </div>
 
       {!isLoading && (
         <>

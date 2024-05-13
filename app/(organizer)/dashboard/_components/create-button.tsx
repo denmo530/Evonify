@@ -86,7 +86,6 @@ export default function CreateButton() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!orgId) return;
 
-    console.log(values);
     const postUrl = await generateUploadUrl();
 
     const result = await fetch(postUrl, {
