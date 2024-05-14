@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import React from "react";
-import DashboardCard from "./dashboard-card";
+import DashboardCard, { IDashboardCard } from "./dashboard-card";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Loader2 } from "lucide-react";
@@ -9,6 +9,7 @@ export default function OverviewCards({ orgId }: { orgId: string }) {
     api.subscribers.getSubscribers,
     orgId ? { orgId } : "skip"
   );
+  const events = useQuery(api.events.getEvents, orgId ? { orgId } : "skip");
 
   const isLoading = subscribers === undefined;
   let currentDate = new Date();
@@ -22,18 +23,49 @@ export default function OverviewCards({ orgId }: { orgId: string }) {
 
   let currentSubscriberCount = subscribers?.length ?? 0;
 
-  let percentageGrowth =
-    ((currentSubscriberCount - subscribersFourWeeksAgo) /
-      subscribersFourWeeksAgo) *
-    100;
+  let percentageGrowthSubs = 0;
+  if (subscribersFourWeeksAgo !== 0) {
+    percentageGrowthSubs =
+      ((currentSubscriberCount - subscribersFourWeeksAgo) /
+        subscribersFourWeeksAgo) *
+      100;
+  }
 
-  const subscribersData = {
-    title: "Subscribers",
-    description: "Amount of total subscribers to your events.",
-    percentageGrowth: percentageGrowth,
-    comparisonAmount: subscribersFourWeeksAgo,
-    amount: subscribers?.length,
-  };
+  let eventsFourWeeksAgo =
+    events?.filter((event) => new Date(event._creationTime) >= fourWeeksAgoDate)
+      .length ?? 0;
+
+  let percentageGrowthEvents = 0;
+  if (subscribersFourWeeksAgo !== 0) {
+    percentageGrowthEvents =
+      ((currentSubscriberCount - subscribersFourWeeksAgo) /
+        subscribersFourWeeksAgo) *
+      100;
+  }
+
+  const data: IDashboardCard[] = [
+    {
+      title: "Subscribers",
+      description: "Amount of total subscribers to your events.",
+      percentageGrowth: percentageGrowthSubs,
+      comparisonAmount: subscribersFourWeeksAgo,
+      amount: subscribers?.length,
+    },
+    {
+      title: "Events",
+      description: "Amount of total events created by you.",
+      amount: events?.length,
+      comparisonAmount: eventsFourWeeksAgo,
+      percentageGrowth: percentageGrowthEvents,
+    },
+    {
+      title: "Events",
+      description: "Amount of total events created by you.",
+      amount: events?.length,
+      comparisonAmount: eventsFourWeeksAgo,
+      percentageGrowth: percentageGrowthEvents,
+    },
+  ];
 
   return (
     <div>
@@ -44,10 +76,10 @@ export default function OverviewCards({ orgId }: { orgId: string }) {
         </div>
       )}
       {!isLoading && (
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          <DashboardCard data={subscribersData} />
-          {/* <DashboardCard />
-        <DashboardCard /> */}
+        <div className="grid sm:grid-cols-3 grid-cols-1 gap-2 mt-2">
+          {data.map((item, i) => (
+            <DashboardCard key={i} data={item} />
+          ))}
         </div>
       )}
     </div>
