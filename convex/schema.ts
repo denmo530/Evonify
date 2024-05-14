@@ -19,5 +19,7 @@ export default defineSchema({
   subscribers: defineTable({
     email: v.string(),
     orgId: v.string(),
-  }).index("by_email_orgId", ["email", "orgId"]),
+  })
+    .index("by_email_orgId", ["email", "orgId"])
+    .index("by_orgId", ["orgId"]),
 });

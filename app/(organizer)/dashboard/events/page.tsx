@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { SearchBar } from "../_components/search-bar";
 import Link from "next/link";
+import EventsCarousel from "../_components/events-carousel";
 
 function Placeholder() {
   return (
@@ -30,27 +31,35 @@ function Placeholder() {
 }
 
 export default function Events() {
+  const [query, setQuery] = React.useState("");
+
   const user = useUser();
   const organization = useOrganization();
-
-  const [query, setQuery] = React.useState("");
 
   let orgId: string | undefined = undefined;
 
   if (organization.isLoaded && user.isLoaded)
     orgId = organization.organization?.id ?? user.user?.id;
 
+  const orgName =
+    organization.organization?.name ??
+    user.user?.username ??
+    user.user?.primaryEmailAddress?.emailAddress;
+
   const events = useQuery(
     api.events.getEvents,
     orgId ? { orgId, query } : "skip"
   );
 
-  const isLoading = events === undefined;
+  const activeEvents = events?.filter(
+    (event) => new Date(event.date) > new Date()
+  );
 
-  const orgName =
-    organization.organization?.name ??
-    user.user?.username ??
-    user.user?.primaryEmailAddress?.emailAddress;
+  const previousEvents = events?.filter(
+    (event) => new Date(event.date) < new Date()
+  );
+
+  const isLoading = events === undefined;
 
   return (
     <main className="container mx-auto pt-12">
@@ -83,10 +92,13 @@ export default function Events() {
 
           {events?.length === 0 && <Placeholder />}
 
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            {events?.map((event) => (
-              <EventCard key={event._id} event={event} />
-            ))}
+          <div className="mt-8 mb-8">
+            <h2 className="text-2xl font-semibold">Active Events</h2>
+            <EventsCarousel events={activeEvents} />
+          </div>
+          <div>
+            <h2 className="text-2xl font-semibold">Previous Events</h2>
+            <EventsCarousel events={previousEvents} />
           </div>
         </>
       )}

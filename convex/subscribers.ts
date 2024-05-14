@@ -1,6 +1,35 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, MutationCtx, QueryCtx } from "./_generated/server";
+import { mutation, MutationCtx, query, QueryCtx } from "./_generated/server";
 import { clerkClient } from "@clerk/clerk-sdk-node";
+import { hasAccessToOrg } from "./events";
+
+export const getSubscribers = query({
+  args: {
+    orgId: v.string(),
+  },
+  async handler(ctx, args) {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) return [];
+
+    const hasAccess = await hasAccessToOrg(
+      ctx,
+      identity.tokenIdentifier,
+      args.orgId
+    );
+
+    if (!hasAccess) return [];
+
+    let subscribers = await ctx.db
+      .query("subscribers")
+      .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+      .collect();
+
+    if (!subscribers) return [];
+
+    return subscribers;
+  },
+});
 
 async function getSubscriber(
   ctx: QueryCtx | MutationCtx,
