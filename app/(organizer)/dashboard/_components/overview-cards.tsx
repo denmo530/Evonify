@@ -59,8 +59,9 @@ export default function OverviewCards({ orgId }: { orgId: string }) {
       percentageGrowth: percentageGrowthEvents,
     },
     {
-      title: "Events",
-      description: "Amount of total events created by you.",
+      // TODO: Add real data for page visitors
+      title: "Opens",
+      description: "Amount of total visitors to your affiliation page.",
       amount: events?.length,
       comparisonAmount: eventsFourWeeksAgo,
       percentageGrowth: percentageGrowthEvents,
