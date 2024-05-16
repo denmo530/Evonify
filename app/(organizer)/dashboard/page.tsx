@@ -1,4 +1,5 @@
 "use client";
+
 import { useOrganization, useUser } from "@clerk/nextjs";
 import React from "react";
 import OverviewCards from "./_components/overview-cards";
@@ -72,10 +73,12 @@ export default function DashboardPage() {
           </div>
           <div className="w-full sm:w-[35%] p-5">
             <div className="w-full flex justify-end gap-2">
-              <Button>
-                <PenBox className="w-4 h-4 mr-1" />
-                Start Writing
-              </Button>
+              <Link href={"/dashboard/write"}>
+                <Button variant={"secondary"}>
+                  <PenBox className="w-4 h-4 mr-1" />
+                  Start Writing
+                </Button>
+              </Link>
             </div>
             <div>
               <h5 className="text-xl font-medium">Resources</h5>

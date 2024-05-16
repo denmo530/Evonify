@@ -11,16 +11,27 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-import Link from "next/link";
 import { SlashIcon } from "lucide-react";
-import EmailEditor from "@/app/(organizer)/dashboard/_components/email-editor";
+import EmailEditor from "../../../../_components/email-editor";
+import { useOrganization, useUser } from "@clerk/nextjs";
 
 export default function WriteEmailPage({
   params,
 }: {
   params: { title: string };
 }) {
+  const user = useUser();
+  const organization = useOrganization();
+
   const title = params.title.replace(/-/g, " ");
+
+  let orgId: string | undefined = undefined;
+  let userId: string | undefined = undefined;
+
+  if (organization.isLoaded && user.isLoaded) {
+    userId = user.user?.id;
+    orgId = organization.organization?.id;
+  }
 
   return (
     <>
@@ -33,7 +44,7 @@ export default function WriteEmailPage({
           {title}
         </div>
         <div className="my-5">
-          <EmailEditor />
+          <EmailEditor title={title} />
         </div>
       </main>
     </>

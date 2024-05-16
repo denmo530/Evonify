@@ -40,9 +40,34 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, UseFormReturn } from "react-hook-form";
 
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, MoreVertical, Plus, TrashIcon } from "lucide-react";
 
 import { useRouter } from "next/navigation";
+
+import Link from "next/link";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Doc } from "@/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useToast } from "@/components/ui/use-toast";
 
 enum ContactMethods {
   Email,
@@ -71,10 +96,7 @@ export function CreateDraftButton() {
     if (values.method === "email") {
       router.push("/dashboard/write/new-notification/email/" + formattedTitle);
     } else {
-      router.push(
-        "/dashboard/write/new-notification/text-message/?title=" +
-          formattedTitle
-      );
+      router.push("/dashboard/write/text-message/?title=" + formattedTitle);
     }
   }
 
@@ -176,6 +198,74 @@ export function CreateDraftButton() {
   );
 }
 
-export function DraftCard() {
-  return <div>Card</div>;
+export function DraftCard({ draft }: { draft: any }) {
+  return (
+    <Card className="w-[200px] relative h-[200px] flex flex-col items-center justify-center cursor-pointer">
+      <div className="absolute top-4 right-2 ">
+        <CardActions notification={draft} />
+      </div>
+      <Link href={draft.url}>
+        <CardHeader className="relative">
+          <CardTitle>{draft.title}</CardTitle>
+        </CardHeader>
+      </Link>
+    </Card>
+  );
+}
+
+function CardActions({ notification }: { notification: Doc<"notifications"> }) {
+  const deleteNotification = useMutation(api.notifications.deleteNotification);
+
+  const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+
+  const { toast } = useToast();
+
+  return (
+    <>
+      <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              event and send a notification to guests informing them of the
+              event&apos;s cancellation.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={async () => {
+                await deleteNotification({ notificationId: notification._id });
+
+                toast({
+                  variant: "default",
+                  title: "Draft deleted",
+                  description: "Your draft has been successfully deleted.",
+                });
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <MoreVertical />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem
+            className="flex gap-2 text-red-600 items-center cursor-pointer"
+            onClick={() => setIsConfirmOpen(true)}
+          >
+            <TrashIcon className="h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
 }

@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { BellRing } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -16,10 +18,20 @@ export default function Home() {
         </p>
       </section>
       <section>
-        <Button className="flex gap-2">
-          <BellRing size={18} />
-          Subscribe to mailing list.
-        </Button>
+        <SignedOut>
+          <Button className="flex gap-2">
+            <BellRing size={18} />
+            Subscribe to mailing list.
+          </Button>
+        </SignedOut>
+        <SignedIn>
+          <Link href={"/dashboard"}>
+            <Button className="flex gap-2">
+              <BellRing size={18} />
+              Enter Dashboard
+            </Button>
+          </Link>
+        </SignedIn>
       </section>
     </main>
   );

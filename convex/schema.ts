@@ -22,4 +22,11 @@ export default defineSchema({
   })
     .index("by_email_orgId", ["email", "orgId"])
     .index("by_orgId", ["orgId"]),
+  notifications: defineTable({
+    title: v.string(),
+    content: v.string(),
+    authorId: v.string(),
+  })
+    .index("by_authorId_title", ["authorId", "title"])
+    .index("by_authorId", ["authorId"]),
 });
