@@ -92,17 +92,11 @@
 
 - Personalized Notifications: Notifications are customized to match each user's interests, ensuring relevance and engagement.
 
-- (TODO) Event Filtering: Users can filter events based on various criteria, such as location, date, and event type.
-
-- (TODO) Recommendation Engine: The platform provides event recommendations based on user preferences and past interactions.
-
 - User Profile Management: Users can manage their profiles, update preferences, and view subscription history.
 
 - Communication Channels: Notifications can be sent via email or text message, based on user preferences.
 
 - Subscription Plans: Evonify is a SaaS platform where user's can choose different subscription plans to access premium features.
-
-- (TODO) Event Planning Tool: User's can use the event planning tool to leverage AI to streamline planning of events
 
 <!-- GETTING STARTED -->
 
@@ -132,35 +126,32 @@ A supported version of Node and the package manager npm is needed. API keys from
    npm install
    ```
 3. Enter your API keys in `.env.local`
-   ```js
+   ```sh
    CONVEX_DEPLOYMENT = " ";
    NEXT_PUBLIC_CONVEX_URL = " ";
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = " ";
    CLERK_SECRET_KEY = " ";
    ```
 
-```
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
 
-## Usage
+## Screenshots
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+<!-- Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- ROADMAP -->
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 ## Roadmap
 
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-- [ ] Nested Feature
+- Event Filtering: Users can view and filter events based on various criteria, such as location, date, and event type.
+
+- Recommendation Engine: The platform provides event recommendations based on user preferences and past interactions.
+
+- Event Planning Tool: User's can use the event planning tool to leverage AI to streamline planning of events
 
 See the [open issues](https://github.com/denmo530/evonify/issues) for a full list of proposed features (and known issues).
 
@@ -195,7 +186,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## Contact
 
-Your Name - dennis.moradkhani@gmail.com
+Dennis Moradkhani - dennis.moradkhani@gmail.com
 
 Project Link: [https://github.com/denmo530/evonify](https://github.com/denmo530/evonify)
 
@@ -204,10 +195,6 @@ Project Link: [https://github.com/denmo530/evonify](https://github.com/denmo530/
 <!-- ACKNOWLEDGMENTS -->
 
 ## Acknowledgments
-
-- []()
-- []()
-- []()
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -243,4 +230,7 @@ Project Link: [https://github.com/denmo530/evonify](https://github.com/denmo530/
 [Bootstrap-url]: https://getbootstrap.com
 [JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
 [JQuery-url]: https://jquery.com
+
+```
+
 ```
