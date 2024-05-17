@@ -30,6 +30,7 @@ export const getNotificationsByAuthorId = query({
     const notifications = await ctx.db
       .query("notifications")
       .withIndex("by_authorId", (q) => q.eq("authorId", args.authorId))
+      .order("desc")
       .collect();
 
     if (!notifications) return [];
@@ -51,7 +52,7 @@ export const getNotificationsByAuthorIdAndTitle = query({
       )
       .first();
 
-    if (!notification) throw new ConvexError("Notification does not exist.");
+    if (!notification) return null;
 
     return notification;
   },

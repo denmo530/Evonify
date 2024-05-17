@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { CreateDraftButton, DraftCard } from "../_components/draft-card";
+import { DraftCard } from "../_components/draft-card";
+import { CreateDraftButton } from "../_components/create-draft-button";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useOrganization, useUser } from "@clerk/nextjs";

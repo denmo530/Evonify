@@ -86,14 +86,18 @@ export default function Editor({ title }: { title: string }) {
     authorId ? { authorId: authorId, title: title } : "skip"
   );
 
+  React.useEffect(() => {
+    if (notification || notification === null) {
+      setIsLoading(false);
+    }
+  }, [notification]);
+
   const onReady: EmailEditorProps["onReady"] = (unlayer) => {
     unlayer.setAppearance({
       theme: editorTheme,
     });
 
     if (notification) unlayer.loadDesign(JSON.parse(notification?.content));
-
-    setIsLoading(false);
   };
 
   return (
@@ -117,7 +121,7 @@ export default function Editor({ title }: { title: string }) {
           Send
         </Button>
       </div>
-      {notification && (
+      {!isLoading && (
         <EmailEditor
           minHeight={"80vh"}
           ref={emailEditorRef}

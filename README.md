@@ -81,6 +81,7 @@
 
 - [![Next][Next.js]][Next-url]
 - [![React][React.js]][React-url]
+- [![ShadCn][ShadCn]][ShadCn-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -230,6 +231,8 @@ Project Link: [https://github.com/denmo530/evonify](https://github.com/denmo530/
 [Bootstrap-url]: https://getbootstrap.com
 [JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
 [JQuery-url]: https://jquery.com
+[ShadCn]: https://img.shields.io/badge/shadcn%2Fui-000?logo=shadcnui&logoColor=fff
+[ShadCn-url]: https://ui.shadcn.com
 
 ```
 
