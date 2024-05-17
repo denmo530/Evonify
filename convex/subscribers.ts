@@ -20,7 +20,7 @@ export const getSubscribers = query({
 
     if (!hasAccess) return [];
 
-    let subscribers = await ctx.db
+    const subscribers = await ctx.db
       .query("subscribers")
       .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
       .collect();

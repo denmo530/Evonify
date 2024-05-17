@@ -6,10 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
-import { useQuery } from "convex/react";
-import { fetchQuery } from "convex/nextjs";
+
 import { TrendingUp } from "lucide-react";
 
 export interface IDashboardCard {
@@ -26,6 +24,8 @@ import {
 } from "../actions/dashboard-analytics";
 import { IMonthData } from "@/lib/data-analytics";
 import { Doc } from "@/convex/_generated/dataModel";
+
+// TODO: Refactor all cards into one component and pass analytics function as props
 
 export function SubscribersCard({
   subscribers,

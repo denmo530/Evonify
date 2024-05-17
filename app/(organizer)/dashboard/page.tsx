@@ -8,6 +8,9 @@ import { BadgeHelp, Copy, PenBox } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { SubscribersChart } from "./_components/subscribers-chart";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export default function DashboardPage() {
   const [copied, setCopied] = React.useState(false);
@@ -27,6 +30,11 @@ export default function DashboardPage() {
 
   const displayName =
     user.user?.username ?? user.user?.primaryEmailAddress?.emailAddress;
+
+  const subscribers = useQuery(
+    api.subscribers.getSubscribers,
+    orgId ? { orgId } : "skip"
+  );
 
   const { toast } = useToast();
 
@@ -48,7 +56,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="container mx-auto pt-12">
+    <main className="container mx-auto pt-12 mb-8">
       <div className="flex justify-between items-center mb-8">
         <div className="space-y-1">
           <h1 className="text-4xl font-bold">
@@ -68,8 +76,13 @@ export default function DashboardPage() {
           Here&apos;s how your events are doing.
         </p>
         <div className="w-full flex flex-col sm:flex-row">
-          <div className="w-full md:w-[65%] min-h-88vh">
-            <OverviewCards orgId={orgId ?? ""} />
+          <div className="w-full md:w-[65%] min-h-88vh space-y-8">
+            {orgId && subscribers && (
+              <>
+                <OverviewCards orgId={orgId ?? ""} />
+                <SubscribersChart subscribers={subscribers} />
+              </>
+            )}
           </div>
           <div className="w-full sm:w-[35%] p-5">
             <div className="w-full flex justify-end gap-2">
