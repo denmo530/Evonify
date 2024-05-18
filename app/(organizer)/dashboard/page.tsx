@@ -4,7 +4,7 @@ import { useOrganization, useUser } from "@clerk/nextjs";
 import React from "react";
 import OverviewCards from "./_components/overview-cards";
 import { Button } from "@/components/ui/button";
-import { BadgeHelp, Copy, PenBox } from "lucide-react";
+import { BadgeHelp, Copy, HeartHandshake, PenBox } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -28,8 +28,7 @@ export default function DashboardPage() {
     user.user?.username ??
     user.user?.primaryEmailAddress?.emailAddress;
 
-  const displayName =
-    user.user?.username ?? user.user?.primaryEmailAddress?.emailAddress;
+  const displayName = user.user?.fullName ?? user.user?.username;
 
   const subscribers = useQuery(
     api.subscribers.getSubscribers,
@@ -136,19 +135,19 @@ export default function DashboardPage() {
                     </div>
                   </Link>
                 </div>
-                <div className="w-full border rounded p-5 my-3">
-                  <h5 className="font-medium">Tutorials</h5>
-                  <p className="text-sm opacity-[.7]">
-                    Learn how to get started on our{" "}
-                    <Link href={"/help"}>
-                      <span className="font-medium cursor-pointer text-special hover:underline">
-                        help
-                      </span>{" "}
-                    </Link>
-                    page and utilize all our features, directly from the Evonify
-                    team
-                  </p>
-                </div>
+              </div>
+              <div className="w-full border rounded p-5 my-3">
+                <h5 className="font-medium">Tutorials</h5>
+                <p className="text-sm opacity-[.7]">
+                  Learn how to get started on our{" "}
+                  <Link href={"/help"}>
+                    <span className="font-medium cursor-pointer text-special hover:underline">
+                      help
+                    </span>{" "}
+                  </Link>
+                  page and utilize all our features, directly from the Evonify
+                  team
+                </p>
               </div>
             </div>
           </div>

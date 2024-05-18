@@ -38,7 +38,7 @@ import { api } from "@/convex/_generated/api";
 import { useToast } from "@/components/ui/use-toast";
 import Image from "next/image";
 
-function EventCardActions({ event }: { event: Doc<"events"> }) {
+export function EventCardActions({ event }: { event: Doc<"events"> }) {
   const deleteEvent = useMutation(api.events.deleteEvent);
 
   const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
@@ -102,7 +102,7 @@ export default function EventCard({
   event: Doc<"events"> & { url: string | null };
 }) {
   return (
-    <Card>
+    <Card className="w-auto">
       <CardHeader className="relative mb-4 ">
         {event.url && (
           <div className="overflow-hidden h-16">

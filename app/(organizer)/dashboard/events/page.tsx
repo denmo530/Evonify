@@ -1,16 +1,14 @@
 "use client";
 
 import { useOrganization, useUser } from "@clerk/nextjs";
-import { useQuery } from "convex/react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 import React from "react";
 import CreateButton from "../_components/create-button";
-import EventCard from "../_components/event-card";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { SearchBar } from "../_components/search-bar";
-import Link from "next/link";
 import EventsCarousel from "../_components/events-carousel";
 
 function Placeholder() {
@@ -44,6 +42,7 @@ export default function Events() {
   const orgName =
     organization.organization?.name ??
     user.user?.username ??
+    user.user?.fullName ??
     user.user?.primaryEmailAddress?.emailAddress;
 
   const events = useQuery(
@@ -51,12 +50,24 @@ export default function Events() {
     orgId ? { orgId, query } : "skip"
   );
 
-  const activeEvents = events?.filter(
-    (event) => new Date(event.date) > new Date()
+  const {
+    results: prevEvents,
+    status: prevEventsStatus,
+    loadMore: loadMorePrevEvents,
+  } = usePaginatedQuery(
+    api.events.getPrevEventsByUser,
+    orgId ? { orgId } : "skip",
+    { initialNumItems: 5 }
   );
 
-  const previousEvents = events?.filter(
-    (event) => new Date(event.date) < new Date()
+  const {
+    results: activeEvents,
+    status: activeEventsStatus,
+    loadMore: loadMoreActiveEvents,
+  } = usePaginatedQuery(
+    api.events.getActiveEventsByUser,
+    orgId ? { orgId } : "skip",
+    { initialNumItems: 5 }
   );
 
   const isLoading = events === undefined;
@@ -69,10 +80,6 @@ export default function Events() {
           <div className="text-xl">Loading your events...</div>
         </div>
       )}
-
-      <div>
-        <Link href={`/subscribe/${orgId}`}>Link to subscription page</Link>
-      </div>
 
       {!isLoading && (
         <>
@@ -92,13 +99,28 @@ export default function Events() {
 
           {events?.length === 0 && <Placeholder />}
 
-          <div className="mt-8 mb-8">
-            <h2 className="text-2xl font-semibold">Active Events</h2>
-            <EventsCarousel events={activeEvents} />
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold">Previous Events</h2>
-            <EventsCarousel events={previousEvents} />
+          <div className="mt-8 space-y-8">
+            {activeEvents && activeEvents.length > 0 && (
+              <div>
+                <EventsCarousel
+                  events={activeEvents}
+                  loadMore={() => loadMoreActiveEvents(1)}
+                  status={activeEventsStatus}
+                  heading="Active Events"
+                />
+              </div>
+            )}
+
+            {prevEvents && prevEvents.length > 0 && (
+              <div>
+                <EventsCarousel
+                  events={prevEvents}
+                  loadMore={() => loadMorePrevEvents(1)}
+                  status={prevEventsStatus}
+                  heading="Previous Events"
+                />
+              </div>
+            )}
           </div>
         </>
       )}

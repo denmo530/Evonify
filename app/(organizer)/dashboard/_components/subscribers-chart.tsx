@@ -20,7 +20,7 @@ export function SubscribersChart({
   // Transform the data to match the structure expected by the AreaChart
   const data = subscribersData.map((item) => ({
     date: item.month,
-    Subscribers: item?.count,
+    Subs: item?.count,
   }));
 
   const summary = [
@@ -64,7 +64,7 @@ export function SubscribersChart({
           <AreaChart
             data={data}
             index="date"
-            categories={["Subscribers"]}
+            categories={["Subs"]}
             colors={["special"]}
             valueFormatter={valueFormatter}
             showLegend={false}

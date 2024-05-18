@@ -2,6 +2,7 @@ import { QueryCtx, MutationCtx } from "./_generated/server.d";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getUser } from "./users";
+import { paginationOptsValidator, PaginationResult } from "convex/server";
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
@@ -82,6 +83,7 @@ export const getEvents = query({
     let events = await ctx.db
       .query("events")
       .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+      .order("desc")
       .collect();
 
     const eventsWithUrl = await Promise.all(
@@ -122,5 +124,111 @@ export const deleteEvent = mutation({
     if (!hasAccess) throw new ConvexError("you do not have access to event.");
 
     await ctx.db.delete(args.eventId);
+  },
+});
+
+// ? Look into paginated queries and full text search queries.
+// export const list = query({
+//   args: { paginationOpts: paginationOptsValidator, orgId: v.string() },
+//   handler: async (ctx, args) => {
+//     const results = await ctx.db
+//       .query("events")
+//       .filter((q) => q.eq(q.field("orgId"), args.orgId))
+//       .order("desc")
+//       .paginate(args.paginationOpts);
+
+//     return {
+//       ...results,
+//       page: await Promise.all(
+//         results.page.map(async (event) => ({
+//           ...event,
+//           url: await ctx.storage.getUrl(event.imgId),
+//         }))
+//       ),
+//     };
+//   },
+// });
+
+export const getActiveEventsByUser = query({
+  args: { paginationOpts: paginationOptsValidator, orgId: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) throw new ConvexError("user is not logged in");
+
+    const hasAccess = await hasAccessToOrg(
+      ctx,
+      identity.tokenIdentifier,
+      args.orgId
+    );
+
+    if (!hasAccess)
+      throw new ConvexError("user does not have access to events");
+
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    const eventsWithUrl = await Promise.all(
+      events.page.map(async (event) => ({
+        ...event,
+        url: await ctx.storage.getUrl(event.imgId),
+      }))
+    );
+
+    const activeEvents = eventsWithUrl.filter((event) => {
+      const eventTimestamp = Date.parse(event.date); // Convert event date to timestamp
+      const currentTimestamp = Date.now(); // Get current timestamp
+      return eventTimestamp >= currentTimestamp;
+    });
+
+    return {
+      ...events,
+      page: activeEvents,
+    };
+  },
+});
+
+export const getPrevEventsByUser = query({
+  args: { paginationOpts: paginationOptsValidator, orgId: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) throw new ConvexError("user is not logged in");
+
+    const hasAccess = await hasAccessToOrg(
+      ctx,
+      identity.tokenIdentifier,
+      args.orgId
+    );
+
+    if (!hasAccess)
+      throw new ConvexError("user does not have access to events");
+
+    const events = await ctx.db
+      .query("events")
+      .filter((q) => q.eq(q.field("orgId"), args.orgId))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    const eventsWithUrl = await Promise.all(
+      events.page.map(async (event) => ({
+        ...event,
+        url: await ctx.storage.getUrl(event.imgId),
+      }))
+    );
+
+    const prevEvents = eventsWithUrl.filter((event) => {
+      const eventTimestamp = Date.parse(event.date); // Convert event date to timestamp
+      const currentTimestamp = Date.now(); // Get current timestamp
+      return eventTimestamp < currentTimestamp;
+    });
+
+    return {
+      ...events,
+      page: prevEvents,
+    };
   },
 });

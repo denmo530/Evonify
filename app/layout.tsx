@@ -5,6 +5,7 @@ import ConvexClientProvider from "./ConvexClientProvider";
 import { Header } from "./header";
 import { ThemeProvider } from "./ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
+import Footer from "@/app/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="antialiased">
-      <body className={inter.className}>
+      <body className={(inter.className, "relative")}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -31,6 +32,7 @@ export default function RootLayout({
             <Toaster />
             <Header />
             {children}
+            <Footer />
           </ConvexClientProvider>
         </ThemeProvider>
       </body>
