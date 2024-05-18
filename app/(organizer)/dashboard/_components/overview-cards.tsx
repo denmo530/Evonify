@@ -10,7 +10,7 @@ export default function OverviewCards({ orgId }: { orgId: string }) {
     api.subscribers.getSubscribers,
     orgId ? { orgId } : "skip"
   );
-  const events = useQuery(api.events.getEvents, orgId ? { orgId } : "skip");
+  const events = useQuery(api.events.getEvents, {});
   const isLoading = subscribers === undefined || events === undefined;
 
   return (

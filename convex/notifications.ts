@@ -100,11 +100,7 @@ export const deleteNotification = mutation({
 
     if (!notification) throw new ConvexError("event does not exist.");
 
-    const hasAccess = await hasAccessToOrg(
-      ctx,
-      identity.tokenIdentifier,
-      notification.authorId
-    );
+    const hasAccess = await hasAccessToOrg(ctx, notification.authorId);
 
     if (!hasAccess) throw new ConvexError("you do not have access to event.");
 

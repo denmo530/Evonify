@@ -12,11 +12,7 @@ export const getSubscribers = query({
 
     if (!identity) return [];
 
-    const hasAccess = await hasAccessToOrg(
-      ctx,
-      identity.tokenIdentifier,
-      args.orgId
-    );
+    const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
     if (!hasAccess) return [];
 

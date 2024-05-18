@@ -4,7 +4,7 @@ import { BellRing, HeartHandshake, LucideLinkedin } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="border-t py-8 px-16 mt-8 ">
+    <footer className="border-t py-8 px-16 mt-8">
       <div className="container mx-auto prose  ">
         <div className="flex justify-between items-center">
           <div className="space-y-1 text-muted-foreground">

@@ -61,7 +61,7 @@ export default function CreateButton() {
 
   let orgId: string | undefined = undefined;
 
-  if (organization.isLoaded && user.isLoaded)
+  if (organization.isLoaded)
     orgId = organization.organization?.id ?? user.user?.id;
 
   const [isEventDialogOpen, setIsEventDialogOpen] =

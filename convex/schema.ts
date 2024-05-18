@@ -4,6 +4,7 @@ import { v } from "convex/values";
 export default defineSchema({
   events: defineTable({
     name: v.string(),
+    userId: v.id("users"),
     orgId: v.string(),
     location: v.string(),
     date: v.string(),
@@ -14,7 +15,12 @@ export default defineSchema({
   users: defineTable({
     tokenIdentifier: v.string(),
     orgIds: v.array(v.string()),
-  }).index("by_tokenIdentifier", ["tokenIdentifier"]),
+    name: v.string(),
+    email: v.string(),
+    profileImg: v.optional(v.string()),
+  })
+    .index("by_tokenIdentifier", ["tokenIdentifier"])
+    .index("by_orgIds", ["orgIds"]),
 
   subscribers: defineTable({
     email: v.string(),

@@ -3,6 +3,8 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getUser } from "./users";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
+import { clerkClient } from "@clerk/clerk-sdk-node";
+import { Doc, Id } from "./_generated/dataModel";
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
@@ -15,15 +17,31 @@ export const generateUploadUrl = mutation(async (ctx) => {
 
 export async function hasAccessToOrg(
   ctx: QueryCtx | MutationCtx,
-  tokenIdentifier: string,
   orgId: string
 ) {
-  const user = await getUser(ctx, tokenIdentifier);
+  const identity = await ctx.auth.getUserIdentity();
+
+  if (!identity) return null;
+
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_tokenIdentifier", (q) =>
+      q.eq("tokenIdentifier", identity.tokenIdentifier)
+    )
+    .first();
+
+  if (!user) {
+    return null;
+  }
 
   const hasAccess =
-    user.orgIds.includes(orgId) || user.tokenIdentifier.includes(orgId);
+    user.orgIds.some((item) => item === orgId) ||
+    user.tokenIdentifier.includes(orgId);
 
-  return hasAccess;
+  if (!hasAccess) {
+    return null;
+  }
+  return { user };
 }
 
 export const createEvent = mutation({
@@ -36,16 +54,7 @@ export const createEvent = mutation({
     imgId: v.id("_storage"),
   },
   async handler(ctx, args) {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity)
-      throw new ConvexError("You must be logged in to create an event.");
-
-    const hasAccess = await hasAccessToOrg(
-      ctx,
-      identity.tokenIdentifier,
-      args.orgId
-    );
+    const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
     if (!hasAccess)
       throw new ConvexError("you do not have access to this organization");
@@ -57,35 +66,17 @@ export const createEvent = mutation({
       date: args.date,
       description: args.description,
       imgId: args.imgId,
+      userId: hasAccess.user._id,
     });
   },
 });
 
 export const getEvents = query({
   args: {
-    orgId: v.string(),
     query: v.optional(v.string()),
   },
   async handler(ctx, args) {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity) return [];
-
-    // ? May want to let everyone get events? maybe remove later
-    const hasAccess = await hasAccessToOrg(
-      ctx,
-      identity.tokenIdentifier,
-      args.orgId
-    );
-
-    if (!hasAccess) return [];
-
-    let events = await ctx.db
-      .query("events")
-      .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
-      .order("desc")
-      .collect();
-
+    let events = await ctx.db.query("events").order("desc").collect();
     const eventsWithUrl = await Promise.all(
       events.map(async (event) => ({
         ...event,
@@ -103,51 +94,47 @@ export const getEvents = query({
   },
 });
 
+async function hasAccessToEvent(
+  ctx: QueryCtx | MutationCtx,
+  eventId: Id<"events">
+) {
+  const event = await ctx.db.get(eventId);
+
+  if (!event) {
+    return null;
+  }
+
+  const hasAccess = await hasAccessToOrg(ctx, event.orgId);
+
+  if (!hasAccess) {
+    return null;
+  }
+
+  return { user: hasAccess.user, event };
+}
+
+function assertCanDeleteEvent(user: Doc<"users">, event: Doc<"events">) {
+  const canDelete =
+    event.userId === user._id ||
+    user.orgIds.find((orgId) => orgId === event.orgId);
+
+  if (!canDelete) {
+    throw new ConvexError("you have no acces to delete this event");
+  }
+}
+
 export const deleteEvent = mutation({
   args: { eventId: v.id("events") },
   async handler(ctx, args) {
-    const identity = await ctx.auth.getUserIdentity();
+    const access = await hasAccessToEvent(ctx, args.eventId);
 
-    if (!identity)
-      throw new ConvexError("You must be logged in to create an event.");
+    if (!access) throw new ConvexError("no access to event.");
 
-    const event = await ctx.db.get(args.eventId);
-
-    if (!event) throw new ConvexError("event does not exist.");
-
-    const hasAccess = await hasAccessToOrg(
-      ctx,
-      identity.tokenIdentifier,
-      event.orgId
-    );
-
-    if (!hasAccess) throw new ConvexError("you do not have access to event.");
+    assertCanDeleteEvent(access.user, access.event);
 
     await ctx.db.delete(args.eventId);
   },
 });
-
-// ? Look into paginated queries and full text search queries.
-// export const list = query({
-//   args: { paginationOpts: paginationOptsValidator, orgId: v.string() },
-//   handler: async (ctx, args) => {
-//     const results = await ctx.db
-//       .query("events")
-//       .filter((q) => q.eq(q.field("orgId"), args.orgId))
-//       .order("desc")
-//       .paginate(args.paginationOpts);
-
-//     return {
-//       ...results,
-//       page: await Promise.all(
-//         results.page.map(async (event) => ({
-//           ...event,
-//           url: await ctx.storage.getUrl(event.imgId),
-//         }))
-//       ),
-//     };
-//   },
-// });
 
 export const getActiveEventsByUser = query({
   args: { paginationOpts: paginationOptsValidator, orgId: v.string() },
@@ -156,14 +143,9 @@ export const getActiveEventsByUser = query({
 
     if (!identity) throw new ConvexError("user is not logged in");
 
-    const hasAccess = await hasAccessToOrg(
-      ctx,
-      identity.tokenIdentifier,
-      args.orgId
-    );
+    const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
-    if (!hasAccess)
-      throw new ConvexError("user does not have access to events");
+    if (!hasAccess) throw new ConvexError("no access to org");
 
     const events = await ctx.db
       .query("events")
@@ -177,6 +159,8 @@ export const getActiveEventsByUser = query({
         url: await ctx.storage.getUrl(event.imgId),
       }))
     );
+
+    if (events.page.length === 0) return events;
 
     const activeEvents = eventsWithUrl.filter((event) => {
       const eventTimestamp = Date.parse(event.date); // Convert event date to timestamp
@@ -198,20 +182,17 @@ export const getPrevEventsByUser = query({
 
     if (!identity) throw new ConvexError("user is not logged in");
 
-    const hasAccess = await hasAccessToOrg(
-      ctx,
-      identity.tokenIdentifier,
-      args.orgId
-    );
+    const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
-    if (!hasAccess)
-      throw new ConvexError("user does not have access to events");
+    if (!hasAccess) throw new ConvexError("no access to org");
 
     const events = await ctx.db
       .query("events")
       .filter((q) => q.eq(q.field("orgId"), args.orgId))
       .order("desc")
       .paginate(args.paginationOpts);
+
+    if (events.page.length === 0) return events;
 
     const eventsWithUrl = await Promise.all(
       events.page.map(async (event) => ({

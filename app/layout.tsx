@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="antialiased">
-      <body className={(inter.className, "relative")}>
+      <body className={inter.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -31,7 +31,7 @@ export default function RootLayout({
           <ConvexClientProvider>
             <Toaster />
             <Header />
-            {children}
+            <div className="min-h-[80vh]">{children}</div>
             <Footer />
           </ConvexClientProvider>
         </ThemeProvider>

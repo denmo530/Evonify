@@ -8,7 +8,7 @@ import React from "react";
 import CreateButton from "../_components/create-button";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
-import { SearchBar } from "../_components/search-bar";
+import { SearchBar } from "../../../components/search-bar";
 import EventsCarousel from "../_components/events-carousel";
 
 function Placeholder() {
@@ -45,13 +45,14 @@ export default function Events() {
     user.user?.fullName ??
     user.user?.primaryEmailAddress?.emailAddress;
 
-  const events = useQuery(
-    api.events.getEvents,
-    orgId ? { orgId, query } : "skip"
-  );
+  // const events = useQuery(
+  //   api.events.getEvents,
+  //   orgId ? { orgId, query } : "skip"
+  // );
 
   const {
     results: prevEvents,
+    isLoading: prevEventsLoading,
     status: prevEventsStatus,
     loadMore: loadMorePrevEvents,
   } = usePaginatedQuery(
@@ -63,6 +64,7 @@ export default function Events() {
   const {
     results: activeEvents,
     status: activeEventsStatus,
+    isLoading: activeEventsLoading,
     loadMore: loadMoreActiveEvents,
   } = usePaginatedQuery(
     api.events.getActiveEventsByUser,
@@ -70,7 +72,7 @@ export default function Events() {
     { initialNumItems: 5 }
   );
 
-  const isLoading = events === undefined;
+  const isLoading = prevEventsLoading || activeEventsLoading;
 
   return (
     <main className="container mx-auto pt-12">
@@ -97,7 +99,9 @@ export default function Events() {
           </div>
           <SearchBar setQuery={setQuery} query={query} />
 
-          {events?.length === 0 && <Placeholder />}
+          {activeEvents?.length === 0 && prevEvents.length === 0 && (
+            <Placeholder />
+          )}
 
           <div className="mt-8 space-y-8">
             {activeEvents && activeEvents.length > 0 && (

@@ -26,6 +26,9 @@ http.route({
         case "user.created":
           await ctx.runMutation(internal.users.createUser, {
             tokenIdentifier: `https://pet-humpback-66.clerk.accounts.dev|${result.data.id}`,
+            email: result.data.email_addresses[0]?.email_address,
+            name: `${result.data.first_name} ${result.data.last_name}`,
+            profileImg: result.data.image_url,
           });
           break;
         case "organizationMembership.created":

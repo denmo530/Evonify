@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 
 import { Doc, Id } from "@/convex/_generated/dataModel";

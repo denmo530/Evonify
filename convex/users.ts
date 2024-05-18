@@ -1,5 +1,13 @@
 import { ConvexError, v } from "convex/values";
-import { internalMutation, MutationCtx, QueryCtx } from "./_generated/server";
+import {
+  action,
+  internalMutation,
+  internalQuery,
+  MutationCtx,
+  query,
+  QueryCtx,
+} from "./_generated/server";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 
 export async function getUser(
   ctx: QueryCtx | MutationCtx,
@@ -18,10 +26,18 @@ export async function getUser(
 }
 
 export const createUser = internalMutation({
-  args: { tokenIdentifier: v.string() },
+  args: {
+    tokenIdentifier: v.string(),
+    name: v.string(),
+    email: v.string(),
+    profileImg: v.optional(v.string()),
+  },
   async handler(ctx, args) {
     await ctx.db.insert("users", {
       tokenIdentifier: args.tokenIdentifier,
+      name: args.name,
+      email: args.email,
+      profileImg: args.profileImg,
       orgIds: [],
     });
   },
@@ -38,3 +54,15 @@ export const addOrgIdToUser = internalMutation({
     });
   },
 });
+
+// // TODO: Change how users are stored in convex to contain email/name/etc
+// export const getOrgNameByIdAction = action({
+//   args: { orgId: v.string() },
+//   async handler(_, args) {
+//     const name = await clerkClient.organizations.getOrganization({
+//       organizationId: args.orgId,
+//     });
+
+//     return name;
+//   },
+// });
