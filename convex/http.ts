@@ -31,11 +31,23 @@ http.route({
             profileImg: result.data.image_url,
           });
           break;
+        case "user.updated":
+          // TODO: Add update user mutation
+          break;
+        case "user.deleted":
+          //TODO: Add delete user mutation
+          break;
         case "organizationMembership.created":
           await ctx.runMutation(internal.users.addOrgIdToUser, {
             tokenIdentifier: `https://pet-humpback-66.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
             orgId: result.data.organization.id,
           });
+          break;
+        case "organizationMembership.updated":
+          // TODO: Add update organization membership mutation
+          break;
+        case "organizationMembership.deleted":
+          // TODO: Add delete organization mutation
           break;
       }
 

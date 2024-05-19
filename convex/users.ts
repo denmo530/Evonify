@@ -43,6 +43,25 @@ export const createUser = internalMutation({
   },
 });
 
+export const updateUser = internalMutation({
+  args: {
+    tokenIdentifier: v.string(),
+    name: v.string(),
+    email: v.string(),
+    profileImg: v.optional(v.string()),
+  },
+  async handler(ctx, args) {
+    const user = await getUser(ctx, args.tokenIdentifier);
+
+    await ctx.db.patch(user._id, {
+      tokenIdentifier: args.tokenIdentifier,
+      name: args.name,
+      email: args.email,
+      profileImg: args.profileImg,
+    });
+  },
+});
+
 export const addOrgIdToUser = internalMutation({
   args: { tokenIdentifier: v.string(), orgId: v.string() },
   async handler(ctx, args) {
