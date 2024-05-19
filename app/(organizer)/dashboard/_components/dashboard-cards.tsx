@@ -96,6 +96,7 @@ export function EventsCard({ events }: { events: Doc<"events">[] }) {
   const eventsAnalytics = useCallback(async () => {
     if (!events) return;
 
+    console.log("events", events);
     const res = await getEventsData(events);
     if (res) {
       const lastMonthCount = res.last7Months[res.last7Months.length - 1].count;

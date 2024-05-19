@@ -94,6 +94,27 @@ export const getEvents = query({
   },
 });
 
+export const getEventsByUser = query({
+  args: {
+    orgId: v.string(),
+  },
+  async handler(ctx, args) {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) throw new ConvexError("user is not logged in");
+
+    const hasAccess = await hasAccessToOrg(ctx, args.orgId);
+
+    if (!hasAccess) return [];
+
+    return await ctx.db
+      .query("events")
+      .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+      .order("desc")
+      .collect();
+  },
+});
+
 async function hasAccessToEvent(
   ctx: QueryCtx | MutationCtx,
   eventId: Id<"events">
@@ -145,7 +166,7 @@ export const getActiveEventsByUser = query({
 
     const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
-    if (!hasAccess) throw new ConvexError("no access to org");
+    if (!hasAccess) return { page: [] };
 
     const events = await ctx.db
       .query("events")
@@ -184,7 +205,7 @@ export const getPrevEventsByUser = query({
 
     const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
-    if (!hasAccess) throw new ConvexError("no access to org");
+    if (!hasAccess) return { page: [] };
 
     const events = await ctx.db
       .query("events")

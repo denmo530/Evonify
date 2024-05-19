@@ -13,7 +13,7 @@ import {
 } from "@clerk/nextjs";
 import { BellRing } from "lucide-react";
 import Link from "next/link";
-import { ModeToggle } from "./mode-toggle";
+import { ModeToggle } from "../mode-toggle";
 
 export function Header() {
   const clerk = useClerk();
@@ -74,11 +74,6 @@ export function Header() {
               }
             >
               <div className={"hidden space-x-2 lg:flex gap-4"}>
-                <SignedIn>
-                  <OrganizationSwitcher />
-                  <UserButton />
-                </SignedIn>
-
                 <SignedOut>
                   <div className="hidden md:flex items-center ">
                     <span
@@ -94,7 +89,14 @@ export function Header() {
                     </Button>
                   </SignUpButton>
                 </SignedOut>
-                {/* <ModeToggle /> */}
+                <SignedIn>
+                  <Link href="/dashboard">
+                    <Button className="inline-flex items-center justify-center font-semibold h-9 text-sm transition duration-200">
+                      Dashboard
+                    </Button>
+                  </Link>
+                </SignedIn>
+                <ModeToggle />
               </div>
             </div>
           </div>
@@ -103,67 +105,3 @@ export function Header() {
     </header>
   );
 }
-
-// <div className="w-full items-center hidden flex-row justify-between md:flex">
-// <div className="flex items-center gap-2 font-bold text-xl ">
-//   <Link
-//     href={"/"}
-//     className="font-bold flex items-center gap-2 text-lg"
-//   >
-//     <BellRing className="dark:text-white h-5 w-5 " />
-//     <h3>Evonify</h3>
-//   </Link>
-// </div>
-
-// {/* Center Links */}
-// <div className="hidden md:flex space-x-8 items-center justify-center ">
-//   <Button
-//     variant={"link"}
-//     className="text-sm font-medium hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer"
-//   >
-//     Features
-//   </Button>
-//   <Button
-//     variant={"link"}
-//     className="text-sm font-medium hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer"
-//   >
-//     Pricing
-//   </Button>
-//   <Link
-//     href="#"
-//     className="text-sm font-base hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer"
-//   >
-//     Changelog
-//   </Link>
-//   <Link
-//     href="#"
-//     className="text-sm font-base hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer"
-//   >
-//     Roadmap
-//   </Link>
-// </div>
-
-// <div className="flex flex-row items-center space-x-4">
-//   <SignedIn>
-//     <OrganizationSwitcher />
-//     <UserButton />
-//   </SignedIn>
-
-//   <SignedOut>
-//     <div className="hidden md:flex ">
-//       <span
-//         onClick={() => clerk.openSignIn()}
-//         className="text-sm font-medium hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer"
-//       >
-//         Login
-//       </span>
-//     </div>
-//     <SignUpButton mode="modal">
-//       <Button className="inline-flex items-center justify-center font-semibold h-9 text-sm transition duration-200">
-//         Get Started Now
-//       </Button>
-//     </SignUpButton>
-//   </SignedOut>
-//   {/* <ModeToggle /> */}
-// </div>
-// </div>
