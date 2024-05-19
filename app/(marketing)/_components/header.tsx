@@ -13,7 +13,7 @@ import {
 } from "@clerk/nextjs";
 import { BellRing } from "lucide-react";
 import Link from "next/link";
-import { ModeToggle } from "../mode-toggle";
+import { ModeToggle } from "../../mode-toggle";
 
 export function Header() {
   const clerk = useClerk();
@@ -41,18 +41,12 @@ export function Header() {
 
             <div className={"flex w-4/12 justify-center"}>
               <div className="hidden md:flex space-x-8 items-center justify-center ">
-                <Button
-                  variant={"link"}
-                  className="text-sm font-medium hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer"
-                >
+                <span className="inline-block text-sm font-medium hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer">
                   Features
-                </Button>
-                <Button
-                  variant={"link"}
-                  className="text-sm font-medium hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer"
-                >
+                </span>
+                <span className="inline-block text-sm font-medium hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer">
                   Pricing
-                </Button>
+                </span>
                 <Link
                   href="#"
                   className="text-sm font-base hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer"

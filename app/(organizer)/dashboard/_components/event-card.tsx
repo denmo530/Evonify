@@ -61,7 +61,7 @@ export function EventCardActions({ event }: { event: Doc<"events"> }) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 dark:text-white"
               onClick={async () => {
                 await deleteEvent({ eventId: event._id });
 
