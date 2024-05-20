@@ -14,6 +14,7 @@ import Image from "next/image";
 import { useUser, useOrganization } from "@clerk/nextjs";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Link } from "lucide-react";
 
 export interface IEvent extends Doc<"events"> {
   url?: string | null;

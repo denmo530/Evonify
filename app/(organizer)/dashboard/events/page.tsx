@@ -7,9 +7,17 @@ import { api } from "@/convex/_generated/api";
 import React from "react";
 import CreateButton from "../_components/create-button";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
+import { Loader2, SlashIcon } from "lucide-react";
 import { SearchBar } from "../../../components/search-bar";
 import EventsCarousel from "../_components/events-carousel";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 
 function Placeholder() {
   return (
@@ -25,6 +33,24 @@ function Placeholder() {
       </div>
       <CreateButton />
     </div>
+  );
+}
+
+function BreadCrumb() {
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <SlashIcon />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/dashboard/events">Events</BreadcrumbLink>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
   );
 }
 
@@ -44,11 +70,6 @@ export default function Events() {
     user.user?.username ??
     user.user?.fullName ??
     user.user?.primaryEmailAddress?.emailAddress;
-
-  // const events = useQuery(
-  //   api.events.getEvents,
-  //   orgId ? { orgId, query } : "skip"
-  // );
 
   const {
     results: prevEvents,
@@ -85,6 +106,9 @@ export default function Events() {
 
       {!isLoading && (
         <>
+          <div className="mb-4">
+            <BreadCrumb />
+          </div>
           <div className="flex justify-between items-center mb-8">
             <div className="space-y-1">
               <h1 className="text-4xl font-bold">Your Events</h1>

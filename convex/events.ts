@@ -5,6 +5,8 @@ import { getUser } from "./users";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { Doc, Id } from "./_generated/dataModel";
+import { getSubscribers } from "./subscribers";
+import { internal } from "./_generated/api";
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
@@ -44,6 +46,21 @@ export async function hasAccessToOrg(
   return { user };
 }
 
+export const getEventById = query({
+  args: { eventId: v.id("events") },
+  async handler(ctx, args) {
+    const event = await ctx.db.get(args.eventId);
+
+    if (!event) {
+      throw new ConvexError("event not found");
+    }
+
+    const url = await ctx.storage.getUrl(event.imgId);
+
+    return { ...event, url };
+  },
+});
+
 export const createEvent = mutation({
   args: {
     name: v.string(),
@@ -67,6 +84,65 @@ export const createEvent = mutation({
       description: args.description,
       imgId: args.imgId,
       userId: hasAccess.user._id,
+    });
+
+    // Send out email to users
+
+    // get organiser's subscriber list
+    const subscribers = await ctx.db
+      .query("subscribers")
+      .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+      .collect();
+
+    console.log(subscribers);
+    // send email to subscribers
+    await Promise.all(
+      subscribers.map(async (subscriber) => {
+        await ctx.scheduler.runAfter(
+          0,
+          internal.emails.emails.sendEventCreatedEmail,
+          {
+            email: subscriber.email,
+            org: hasAccess.user.name,
+            eventName: args.name,
+            userEmail: hasAccess.user.email,
+            eventImg: await ctx.storage.getUrl(args.imgId),
+          }
+        );
+      })
+    );
+  },
+});
+
+export const updateEvent = mutation({
+  args: {
+    eventId: v.id("events"),
+    name: v.optional(v.string()),
+    location: v.optional(v.string()),
+    date: v.optional(v.string()),
+    description: v.optional(v.string()),
+    imgId: v.optional(v.id("_storage")),
+  },
+  async handler(ctx, args) {
+    const access = await hasAccessToEvent(ctx, args.eventId);
+
+    if (!access) throw new ConvexError("no access to event.");
+
+    const event = await getEventById(ctx, { eventId: args.eventId });
+
+    const { eventId, ...updatedValues } = args;
+
+    // Create an object with the fields to be updated, using existing values for undefined fields
+    const newValues = {
+      name: updatedValues.name ?? event.name,
+      location: updatedValues.location ?? event.location,
+      date: updatedValues.date ?? event.date,
+      description: updatedValues.description ?? event.description,
+      imgId: updatedValues.imgId ?? event.imgId,
+    };
+
+    await ctx.db.patch(event._id, {
+      ...newValues,
     });
   },
 });
@@ -166,7 +242,7 @@ export const getActiveEventsByUser = query({
 
     const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
-    if (!hasAccess) return { page: [] };
+    if (!hasAccess) return { page: [], isDone: true, continueCursor: "" };
 
     const events = await ctx.db
       .query("events")
@@ -205,7 +281,7 @@ export const getPrevEventsByUser = query({
 
     const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
-    if (!hasAccess) return { page: [] };
+    if (!hasAccess) return { page: [], isDone: true, continueCursor: "" };
 
     const events = await ctx.db
       .query("events")

@@ -4,7 +4,7 @@ import { PricingSection } from "./_components/pricing-section";
 
 export default function Home() {
   return (
-    <main className="w-full flex flex-col items-center p-24 ">
+    <main className="w-full flex flex-col items-center p-2 md:p-24 ">
       <HeroSection />
       <FeaturesSection />
       <PricingSection />

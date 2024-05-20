@@ -71,7 +71,11 @@ export function Header() {
                 <SignedOut>
                   <div className="hidden md:flex items-center ">
                     <span
-                      onClick={() => clerk.openSignIn()}
+                      onClick={() =>
+                        clerk.openSignIn({
+                          fallbackRedirectUrl: "/dashboard",
+                        })
+                      }
                       className="text-sm font-medium hover:text-neutral-900 text-neutral-500 duration-200 dark:text-neutral-400 dark:hover:text-white hover:cursor-pointer"
                     >
                       Login

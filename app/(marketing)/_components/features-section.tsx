@@ -17,7 +17,7 @@ const FeatureItem = ({
   icon: React.ReactNode;
 }) => {
   return (
-    <div className="flex flex-col items-center gap-3 text-center">
+    <div className="w-full flex flex-col items-center gap-3 text-center">
       <div className="rounded-md bg-special flex items-center p-3 text-white">
         {icon}
       </div>
@@ -70,8 +70,8 @@ export function FeaturesSection() {
   ];
 
   return (
-    <section className="container mx-auto w-fullflex items-center justify-center ">
-      <div className="grid grid-cols-3 w-full px-12 grid-rows-2 items-center gap-x-8 gap-y-12">
+    <section className="container mx-auto w-full flex flex-col items-center justify-center ">
+      <div className="grid grid-cols-1 md:grid-cols-3 w-full md:px-12 grid-rows-2 items-center gap-x-8 gap-y-12">
         {featureItems.map((feature, index) => (
           <FeatureItem
             key={index}

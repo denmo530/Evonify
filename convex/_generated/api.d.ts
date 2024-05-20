@@ -15,6 +15,8 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as clerk from "../clerk.js";
+import type * as emails_EventCreatedEmail from "../emails/EventCreatedEmail.js";
+import type * as emails_emails from "../emails/emails.js";
 import type * as events from "../events.js";
 import type * as http from "../http.js";
 import type * as notifications from "../notifications.js";
@@ -31,6 +33,8 @@ import type * as users from "../users.js";
  */
 declare const fullApi: ApiFromModules<{
   clerk: typeof clerk;
+  "emails/EventCreatedEmail": typeof emails_EventCreatedEmail;
+  "emails/emails": typeof emails_emails;
   events: typeof events;
   http: typeof http;
   notifications: typeof notifications;

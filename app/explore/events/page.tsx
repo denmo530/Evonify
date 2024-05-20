@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 import { EventCard, IEvent } from "@/app/components/event-card";
 import { Doc } from "@/convex/_generated/dataModel";
 import { clerkClient } from "@clerk/nextjs/server";
+import Link from "next/link";
 
 function Placeholder() {
   return (

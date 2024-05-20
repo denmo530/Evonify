@@ -16,7 +16,7 @@ export function Header() {
             <div className={"flex w-4/12 items-center space-x-4 lg:space-x-8"}>
               <div className={"hidden items-center space-x-0.5 lg:flex"}>
                 <Link
-                  href={"/"}
+                  href={"/dashboard"}
                   className="font-bold flex items-center gap-2 text-lg"
                 >
                   <BellRing className="dark:text-white h-5 w-5 " />
