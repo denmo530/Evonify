@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, MutationCtx, query, QueryCtx } from "./_generated/server";
 import { clerkClient } from "@clerk/clerk-sdk-node";
-import { hasAccessToOrg } from "./events";
+import { hasAccessToOrg } from "./helpers";
 
 export const getSubscribers = query({
   args: {

@@ -68,7 +68,6 @@ export function SubscribersChart({
             colors={["special"]}
             valueFormatter={valueFormatter}
             showLegend={false}
-            showYAxis={false}
             showGradient={false}
             startEndOnly={true}
             className="mt-6 h-32"

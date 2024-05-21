@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-import { Doc, Id } from "@/convex/_generated/dataModel";
+import { Doc } from "@/convex/_generated/dataModel";
 
 import {
   Card,
@@ -21,13 +21,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Edit, MoreVertical, TrashIcon } from "lucide-react";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import { Edit, MoreVertical, Share2, TrashIcon } from "lucide-react";
+
 import { useToast } from "@/components/ui/use-toast";
 import Image from "next/image";
-import Link from "next/link";
-import { DeleteDialog, EditDialog } from "./event-card-dialogs";
+import { DeleteDialog } from "./event-delete-dialog";
+import { EditDialog } from "./event-edit-dialog";
+import { ShareButton } from "./share-button";
 
 export function EventCardActions({
   event,
@@ -39,6 +39,8 @@ export function EventCardActions({
 
   const { toast } = useToast();
 
+  const isDisabled = new Date(event.date) < new Date();
+
   return (
     <>
       <DeleteDialog
@@ -49,16 +51,18 @@ export function EventCardActions({
       <EditDialog event={event} open={isEditOpen} setOpen={setIsEditOpen} />
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <MoreVertical />
+          <MoreVertical className="h-5 w-5" />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem
             className="flex gap-2  items-center cursor-pointer"
             onClick={() => setIsEditOpen(true)}
+            disabled={isDisabled}
           >
             <Edit className="h-4 w-4" />
             Edit
           </DropdownMenuItem>
+
           <DropdownMenuItem
             className="flex gap-2 text-red-600 items-center cursor-pointer"
             onClick={() => setIsDeleteOpen(true)}
@@ -89,12 +93,15 @@ export default function EventCard({
         )}
       </CardHeader>
       <CardContent className="space-y-2 prose relative">
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-2 right-2 flex gap-2 items-center">
+          <ShareButton event={event} />
           <EventCardActions event={event} />
         </div>
         <CardTitle className="text-lg">{event.name}</CardTitle>
         <div className="text-sm">
-          <CardDescription>{event.description}</CardDescription>
+          <CardDescription className="truncate">
+            {event.description}
+          </CardDescription>
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">

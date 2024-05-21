@@ -1,13 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import {
-  action,
-  internalMutation,
-  internalQuery,
-  MutationCtx,
-  query,
-  QueryCtx,
-} from "./_generated/server";
-import { clerkClient } from "@clerk/clerk-sdk-node";
+import { internalMutation, MutationCtx, QueryCtx } from "./_generated/server";
 
 export async function getUser(
   ctx: QueryCtx | MutationCtx,

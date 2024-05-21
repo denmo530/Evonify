@@ -3,7 +3,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getUser } from "./users";
 import { Doc } from "./_generated/dataModel";
-import { hasAccessToOrg } from "./events";
+import { hasAccessToOrg } from "./helpers";
 
 export async function getNotification(
   ctx: QueryCtx | MutationCtx,

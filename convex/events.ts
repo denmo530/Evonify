@@ -1,12 +1,10 @@
 import { QueryCtx, MutationCtx } from "./_generated/server.d";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { getUser } from "./users";
-import { paginationOptsValidator, PaginationResult } from "convex/server";
-import { clerkClient } from "@clerk/clerk-sdk-node";
+import { paginationOptsValidator } from "convex/server";
 import { Doc, Id } from "./_generated/dataModel";
-import { getSubscribers } from "./subscribers";
 import { internal } from "./_generated/api";
+import { hasAccessToOrg } from "./helpers";
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
@@ -16,35 +14,6 @@ export const generateUploadUrl = mutation(async (ctx) => {
 
   return await ctx.storage.generateUploadUrl();
 });
-
-export async function hasAccessToOrg(
-  ctx: QueryCtx | MutationCtx,
-  orgId: string
-) {
-  const identity = await ctx.auth.getUserIdentity();
-
-  if (!identity) return null;
-
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_tokenIdentifier", (q) =>
-      q.eq("tokenIdentifier", identity.tokenIdentifier)
-    )
-    .first();
-
-  if (!user) {
-    return null;
-  }
-
-  const hasAccess =
-    user.orgIds.some((item) => item === orgId) ||
-    user.tokenIdentifier.includes(orgId);
-
-  if (!hasAccess) {
-    return null;
-  }
-  return { user };
-}
 
 export const getEventById = query({
   args: { eventId: v.id("events") },

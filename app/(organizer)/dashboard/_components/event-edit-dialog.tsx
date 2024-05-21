@@ -1,25 +1,12 @@
 "use client";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import {
@@ -53,53 +40,6 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import Image from "next/image";
-import { generateUploadUrl } from "@/convex/events";
-
-export function DeleteDialog({
-  open,
-  setOpen,
-  eventId,
-}: {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  eventId: Id<"events">;
-}) {
-  const { toast } = useToast();
-  const deleteEvent = useMutation(api.events.deleteEvent);
-
-  return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            event and send a notification to guests informing them of the
-            event&apos;s cancellation.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-red-600 hover:bg-red-700 dark:text-white"
-            onClick={async () => {
-              await deleteEvent({ eventId: eventId });
-
-              toast({
-                variant: "default",
-                title: "Event Deleted",
-                description:
-                  "Your event has been successfully deleted, and a notification has been sent to guests.",
-              });
-            }}
-          >
-            Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
 
 const formSchema = z.object({
   name: z.string().min(0).max(100).optional(),
@@ -107,7 +47,6 @@ const formSchema = z.object({
   location: z.string().min(0).max(100).optional(),
   description: z.string().min(0).max(200).optional(),
   img: z.custom((val) => val instanceof FileList, "Required").optional(),
-  // .refine((files: any) => files.length > 0, "Required")
 });
 
 export function EditDialog({

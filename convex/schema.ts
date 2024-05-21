@@ -28,6 +28,12 @@ export default defineSchema({
   })
     .index("by_email_orgId", ["email", "orgId"])
     .index("by_orgId", ["orgId"]),
+  eventSubscribers: defineTable({
+    email: v.string(),
+    eventId: v.id("events"),
+  })
+    .index("by_email_eventId", ["email", "eventId"])
+    .index("by_eventId", ["eventId"]),
   notifications: defineTable({
     title: v.string(),
     content: v.string(),
