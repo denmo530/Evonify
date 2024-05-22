@@ -1,15 +1,13 @@
 import React from "react";
 import Image from "next/image";
-import { SearchBar } from "@/app/components/search-bar";
 import { Loader2 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
-import { query } from "@/convex/_generated/server";
-import { revalidatePath } from "next/cache";
+
 import { EventCard, IEvent } from "@/app/components/event-card";
 import { Doc } from "@/convex/_generated/dataModel";
 import { clerkClient } from "@clerk/nextjs/server";
-import Link from "next/link";
+import { FilterSection } from "../../_components/filter-section";
 
 function Placeholder() {
   return (
@@ -70,27 +68,15 @@ export default async function Events() {
       )}
 
       {!isLoading && (
-        <>
-          <div className="flex flex-col justify-between mb-8 ">
-            <div className="max-w-prose space-y-4 mb-8">
-              <h1 className="text-4xl font-bold">Browse Events</h1>
-              <p className="text-muted-foreground">
-                Welcome to the Explore Events page! Here, you can discover a
-                wide range of events tailored to your interests. Whether
-                you&apos;re looking for local meetups, international
-                conferences, workshops, or social gatherings, you&apos;ll find
-                something that piques your curiosity.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 ">
-              {modifiedEvents &&
-                modifiedEvents.map((event) => {
-                  return <EventCard key={event._id} event={event} />;
-                })}
-            </div>
+        <main className="container mx-auto">
+          <FilterSection />
+          <div className="pt-24 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 ">
+            {modifiedEvents &&
+              modifiedEvents.map((event) => {
+                return <EventCard key={event._id} event={event} />;
+              })}
           </div>
-          {/* <SearchBar setQuery={setQuery} query={query} /> */}
-        </>
+        </main>
       )}
     </main>
   );

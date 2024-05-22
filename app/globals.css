@@ -77,3 +77,51 @@
     @apply bg-background text-foreground;
   }
 }
+@layer components {
+  /* Existing styles */
+  .my-react-select-container .my-react-select__control {
+    @apply bg-[hsl(var(--card))] border-2 border-[hsl(var(--border))] hover:border-[hsl(var(--border))] dark:border-[hsl(var(--border))] dark:hover:border-[hsl(var(--border))];
+  }
+
+  .my-react-select-container .my-react-select__control--is-focused {
+    @apply border-[hsl(var(--border))] hover:border-[hsl(var(--border))] dark:border-[hsl(var(--border))] dark:hover:border-[hsl(var(--border))] shadow-none;
+  }
+
+  .my-react-select-container .my-react-select__menu {
+    @apply bg-[hsl(var(--popover))] dark:bg-[hsl(var(--popover))] border-2 border-[hsl(var(--border))] dark:border-[hsl(var(--border))];
+  }
+
+  .my-react-select-container .my-react-select__option {
+    @apply text-[hsl(var(--foreground))] dark:text-[hsl(var(--foreground))] bg-[hsl(var(--popover))] hover:bg-[hsl(var(--popover))] dark:bg-[hsl(var(--popover))] dark:hover:bg-[hsl(var(--popover))];
+  }
+
+  .my-react-select-container .my-react-select__indicator-separator {
+    @apply bg-[hsl(var(--foreground))];
+  }
+
+  .my-react-select-container .my-react-select__input-container,
+  .my-react-select-container .my-react-select__placeholder,
+  .my-react-select-container .my-react-select__single-value {
+    @apply text-[hsl(var(--foreground))] dark:text-[hsl(var(--foreground))];
+  }
+
+  /* Multi-select specific styles */
+  .my-react-select-container .my-react-select__multi-value {
+    @apply bg-[hsl(var(--primary-light))] dark:bg-[hsl(var(--primary-dark))] rounded-md;
+  }
+
+  .my-react-select-container .my-react-select__multi-value__label {
+    @apply text-[hsl(var(--primary-contrast))] dark:text-[hsl(var(--primary-contrast-dark))] px-2;
+  }
+
+  .my-react-select-container .my-react-select__multi-value__remove {
+    @apply text-[hsl(var(--primary-contrast))] dark:text-[hsl(var(--primary-contrast-dark))] hover:bg-[hsl(var(--primary-light-hover))] dark:hover:bg-[hsl(var(--primary-dark-hover))] rounded-md;
+  }
+}
+
+.leaflet-bottom,
+.leaflet-control,
+.leaflet-pane,
+.leaflet-top {
+  z-index: 0 !important;
+}

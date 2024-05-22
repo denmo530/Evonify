@@ -19,6 +19,7 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { EventWizard } from "../_components/event-creation-wizard";
 
 function Placeholder() {
   return (
@@ -120,7 +121,8 @@ export default function Events() {
                 </span>
               </div>
             </div>
-            <CreateButton />
+            {/* <CreateButton /> */}
+            <EventWizard />
           </div>
           <SearchBar setQuery={setQuery} query={query} />
 
