@@ -124,7 +124,7 @@ export default function Events() {
             {/* <CreateButton /> */}
             <EventWizard />
           </div>
-          <SearchBar setQuery={setQuery} query={query} />
+          {/* <SearchBar setQuery={setQuery} query={query} /> */}
 
           {activeEvents?.length === 0 && prevEvents.length === 0 && (
             <Placeholder />

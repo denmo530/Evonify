@@ -63,7 +63,6 @@ export const createEvent = mutation({
       .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
       .collect();
 
-    console.log(subscribers);
     // send email to subscribers
     await Promise.all(
       subscribers.map(async (subscriber) => {
@@ -279,3 +278,19 @@ export const getPrevEventsByUser = query({
     };
   },
 });
+
+// export const saveStorageIds = mutation({
+//   args: {
+//     storageIds: v.array(
+//       v.object({
+//         storageId: v.id("_storage"),
+//       })
+//     ),
+//   },
+//   handler: async (ctx, args) => {
+//     ctx.db.patch("events", {
+//       storageIds: args.storageIds.map(({ storageId }) => storageId),
+//       // ...
+//     });
+//   },
+// });

@@ -82,9 +82,10 @@ export default function EventCard({
   event: Doc<"events"> & { url: string | null };
 }) {
   const date = new Date(event.date).toDateString();
+  const isDisabled = new Date(event.date) < new Date();
 
   return (
-    <Card className="w-auto">
+    <Card className={`${isDisabled && "opacity-40"}`}>
       <CardHeader className="relative mb-4 ">
         {event.url && (
           <div className="overflow-hidden h-16 object-contain">

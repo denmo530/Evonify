@@ -10,6 +10,9 @@ export default defineSchema({
     date: v.string(),
     description: v.string(),
     imgId: v.id("_storage"),
+    // imgIds: v.array(v.id("_storage")),
+    // category: v.string(),
+    // tags: v.array(v.string()),
   }).index("by_orgId", ["orgId"]),
 
   users: defineTable({

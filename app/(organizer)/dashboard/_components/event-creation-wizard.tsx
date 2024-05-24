@@ -2,6 +2,8 @@
 
 import React, { useMemo } from "react";
 
+import { Form, FormMessage } from "@/components/ui/form";
+
 import {
   Dialog,
   DialogContent,
@@ -14,27 +16,70 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CategoryBody, InfoBody, LocationBody } from "./steps-body-content";
+import StepsBodyContent from "./steps-body-content";
+
+const DATE_REQUIRED_ERROR = "Date is required.";
 
 export const formSchema = z.object({
-  category: z.string().min(1),
-  location: z.any().nullable(),
+  category: z
+    .string({
+      required_error: "Please select a category",
+      invalid_type_error: "Please select a category",
+    })
+    .min(1),
+  location: z
+    .object({
+      label: z.string(),
+      value: z.string({
+        required_error: "Please select a location",
+        invalid_type_error: "Please select a location",
+      }),
+      flag: z.string(),
+      region: z.string(),
+      latlng: z.array(z.number()),
+    })
+    .transform((val) => {
+      if (val === null || typeof val !== "object" || Array.isArray(val)) {
+        return null; // Return null if the value is null, not an object, or an array
+      }
+      return val;
+    }),
   name: z.string().min(3).max(50),
-  date: z.date(),
+  date: z
+    .object(
+      {
+        from: z.date().optional(),
+        to: z.date().optional(),
+      },
+      { required_error: DATE_REQUIRED_ERROR }
+    )
+    .refine((date) => {
+      return !!date.from;
+    }, DATE_REQUIRED_ERROR),
+  time: z.object({ start: z.string(), end: z.string().optional() }),
   description: z.string().min(10).max(200),
-  attendeeCount: z.number().int(),
-  tags: z.array(z.string()),
-  img: z
-    .custom<FileList>((val) => val instanceof FileList, "Required")
-    .refine((files) => files.length > 0, "Required"),
+  attendeeCount: z.number().int().optional(),
+  tags: z.array(z.object({ label: z.string(), value: z.string() })).nonempty(),
+  imgIds: z.array(z.string()).nonempty(),
 });
 
-enum STEPS {
+export enum STEPS {
   CATEGORY = 0,
   LOCATION = 1,
   INFO = 2,
-  IMAGES = 3,
+  INFO_2 = 3,
+  IMAGES = 4,
 }
+
+const stepValidationFields: {
+  [key in STEPS]: Array<keyof z.infer<typeof formSchema>>;
+} = {
+  [STEPS.CATEGORY]: ["category"],
+  [STEPS.LOCATION]: ["location"],
+  [STEPS.INFO]: ["tags", "date", "time", "attendeeCount"],
+  [STEPS.INFO_2]: ["description", "name"],
+  [STEPS.IMAGES]: ["imgIds"],
+};
 
 export function EventWizard() {
   const [step, setStep] = React.useState(STEPS.CATEGORY);
@@ -46,42 +91,31 @@ export function EventWizard() {
       location: null,
       name: "",
       description: "",
-      date: undefined,
-      attendeeCount: 0,
+      date: {
+        from: undefined,
+        to: undefined,
+      },
+      attendeeCount: undefined,
       tags: [],
-      img: undefined,
+      imgIds: [],
+      time: { start: "", end: "" },
     },
   });
 
-  const category = form.watch("category");
-  const location = form.watch("location");
-  const attendeeCount = form.watch("attendeeCount");
-  const tags = form.watch("tags");
-
-  const setCustomValue = (id: keyof z.infer<typeof formSchema>, value: any) => {
-    form.setValue(id, value, {
-      shouldDirty: true,
-      shouldValidate: true,
-      shouldTouch: true,
-    });
-  };
-
-  const onNext = () => {
-    console.log("next");
-    setStep((value) => value + 1);
-
-    console.log(category);
+  const onNext = async () => {
+    const fieldsToValidate = stepValidationFields[step];
+    const isValid = await form.trigger(fieldsToValidate);
+    if (isValid) setStep((value) => value + 1);
   };
 
   const onBack = () => {
     setStep((value) => value - 1);
   };
 
-  const actionLabel = useMemo(() => {
-    if (step === STEPS.IMAGES) return "Create";
-
-    return "Next";
-  }, [step]);
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log(values);
+    console.log("Submit");
+  };
 
   const secondaryActionLabel = useMemo(() => {
     if (step === STEPS.CATEGORY) return undefined;
@@ -89,52 +123,32 @@ export function EventWizard() {
     return "Back";
   }, [step]);
 
-  let name = "category";
-
-  const bodyContent = () => {
-    switch (step) {
-      case STEPS.CATEGORY:
-        return (
-          <CategoryBody setCustomValue={setCustomValue} category={category} />
-        );
-      case STEPS.LOCATION:
-        return (
-          <LocationBody setCustomValue={setCustomValue} location={location} />
-        );
-      case STEPS.INFO:
-        return (
-          <InfoBody
-            setCustomValue={setCustomValue}
-            attendeeCount={attendeeCount}
-            tags={tags}
-          />
-        );
-    }
-  };
-
   return (
     <EventDialog
-      actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       onNext={onNext}
       onBack={onBack}
-      bodyContent={bodyContent()}
+      onSubmit={onSubmit}
+      form={form}
+      step={step}
     />
   );
 }
 
 function EventDialog({
-  actionLabel,
   secondaryActionLabel,
-  bodyContent,
   onBack,
   onNext,
+  onSubmit,
+  form,
+  step,
 }: {
-  actionLabel: string;
   secondaryActionLabel: string | undefined;
-  bodyContent: React.ReactNode;
   onBack: () => void;
   onNext: () => void;
+  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  form: any;
+  step: number;
 }) {
   return (
     <Dialog>
@@ -142,19 +156,34 @@ function EventDialog({
         <Button variant="default">Add Event</Button>
       </DialogTrigger>
       <DialogContent>
-        {bodyContent}
-        <DialogFooter>
-          <div className="flex gap-4 w-full">
-            {secondaryActionLabel && (
-              <Button variant="outline" onClick={onBack} className="w-full">
-                {secondaryActionLabel}
-              </Button>
-            )}
-            <Button variant={"default"} onClick={onNext} className="w-full">
-              {actionLabel}
-            </Button>
-          </div>
-        </DialogFooter>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <StepsBodyContent form={form} step={step} />
+            <DialogFooter>
+              <div className="flex gap-4 w-full">
+                {secondaryActionLabel && (
+                  <Button variant="outline" onClick={onBack} className="w-full">
+                    {secondaryActionLabel}
+                  </Button>
+                )}
+
+                {step === STEPS.IMAGES ? (
+                  <Button variant={"default"} type="submit" className="w-full">
+                    Create
+                  </Button>
+                ) : (
+                  <Button
+                    variant={"default"}
+                    onClick={onNext}
+                    className="w-full"
+                  >
+                    Next
+                  </Button>
+                )}
+              </div>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

@@ -1,4 +1,6 @@
 "use client";
+import { FormField, FormItem, FormControl } from "@/components/ui/form";
+import { Menu } from "lucide-react";
 import React from "react";
 
 import Select from "react-select";
@@ -109,40 +111,64 @@ export const tags = [
   { label: "Policy", value: "policy" },
 ];
 
-export function TagsInput({
-  value,
-  onChange,
-}: {
-  value: string[];
-  onChange: (value: string) => void;
-}) {
+export type TagSelectValue = {
+  label: string;
+  value: string;
+};
+
+interface TagSelectProps {
+  form: any;
+}
+
+export function TagsInput({ form }: TagSelectProps) {
   const animatedComponents = makeAnimated();
 
   return (
     <div>
-      <Select
-        className="my-react-select-container"
-        classNamePrefix="my-react-select"
-        isClearable
-        isSearchable
-        closeMenuOnSelect={false}
-        components={animatedComponents}
-        placeholder="Select tags"
-        isMulti
-        options={tags}
-        formatOptionLabel={(option: any) => {
-          return (
-            <div className="flex items-center gap-3 text-primary">
-              <div>{option.label}</div>
-            </div>
-          );
-        }}
-        styles={{
-          menuList: (provided) => ({
-            ...provided,
-            maxHeight: "30vh",
-          }),
-        }}
+      <FormField
+        control={form.control}
+        name="tags"
+        render={({ field }) => (
+          <>
+            <FormItem>
+              <FormControl>
+                <Select
+                  className="my-react-select-container"
+                  classNamePrefix="my-react-select"
+                  isClearable
+                  isSearchable
+                  closeMenuOnSelect={false}
+                  components={animatedComponents}
+                  placeholder="Select tags"
+                  isMulti
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={tags}
+                  formatOptionLabel={(option: any) => {
+                    return (
+                      <div className="flex items-center gap-3 text-primary">
+                        <div>{option.label}</div>
+                      </div>
+                    );
+                  }}
+                  menuPlacement="top"
+                  styles={{
+                    menu: (provided) => ({
+                      ...provided,
+                      zIndex: 50,
+                    }),
+                    menuList: (provided) => ({
+                      ...provided,
+                      maxHeight: 200,
+                      overflowY: "auto",
+                      display: "inline-block",
+                    }),
+                  }}
+                />
+              </FormControl>
+            </FormItem>
+          </>
+        )}
       />
     </div>
   );
