@@ -17,6 +17,9 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import StepsBodyContent from "./steps-body-content";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
 const DATE_REQUIRED_ERROR = "Date is required.";
 
@@ -27,23 +30,22 @@ export const formSchema = z.object({
       invalid_type_error: "Please select a category",
     })
     .min(1),
-  location: z
-    .object({
-      label: z.string(),
-      value: z.string({
-        required_error: "Please select a location",
-        invalid_type_error: "Please select a location",
-      }),
-      flag: z.string(),
-      region: z.string(),
-      latlng: z.array(z.number()),
-    })
-    .transform((val) => {
-      if (val === null || typeof val !== "object" || Array.isArray(val)) {
-        return null; // Return null if the value is null, not an object, or an array
-      }
-      return val;
+  location: z.object({
+    label: z.string(),
+    value: z.string({
+      required_error: "Please select a location",
+      invalid_type_error: "Please select a location",
     }),
+    flag: z.string(),
+    region: z.string(),
+    latlng: z.array(z.number()),
+  }),
+  // .transform((val) => {
+  //   if (val === null || typeof val !== "object" || Array.isArray(val)) {
+  //     return null; // Return null if the value is null, not an object, or an array
+  //   }
+  //   return val;
+  // }),
   name: z.string().min(3).max(50),
   date: z
     .object(
@@ -60,7 +62,7 @@ export const formSchema = z.object({
   description: z.string().min(10).max(200),
   attendeeCount: z.number().int().optional(),
   tags: z.array(z.object({ label: z.string(), value: z.string() })).nonempty(),
-  imgIds: z.array(z.string()).nonempty(),
+  imgIds: z.array(z.custom<Id<"_storage">>()),
 });
 
 export enum STEPS {
@@ -81,14 +83,22 @@ const stepValidationFields: {
   [STEPS.IMAGES]: ["imgIds"],
 };
 
-export function EventWizard() {
+export function EventWizard({ orgId }: { orgId: string | undefined }) {
   const [step, setStep] = React.useState(STEPS.CATEGORY);
+
+  const createEvent = useMutation(api.events.createEvent);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       category: "",
-      location: null,
+      location: {
+        label: "",
+        value: "",
+        flag: "",
+        region: "",
+        latlng: [51, -0.09],
+      },
       name: "",
       description: "",
       date: {
@@ -112,9 +122,31 @@ export function EventWizard() {
     setStep((value) => value - 1);
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    console.log("Submit");
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!orgId) return;
+
+    const tagValues = values.tags.map((tag) => tag.value);
+
+    if (values.imgIds.length < 1) return;
+
+    await createEvent({
+      name: values.name,
+      location: values.location && {
+        latlng: values.location.latlng,
+        region: values.location.region,
+      },
+      date: {
+        from: values.date.from?.toISOString() || "",
+        to: values.date.to?.toISOString(),
+      },
+      description: values.description,
+      imgIds: values.imgIds,
+      category: values.category,
+      tags: tagValues,
+      time: values.time,
+      attendeeCount: values.attendeeCount,
+      orgId: orgId,
+    });
   };
 
   const secondaryActionLabel = useMemo(() => {

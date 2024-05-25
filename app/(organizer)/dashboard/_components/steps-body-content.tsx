@@ -81,7 +81,7 @@ export function LocationBody({ form }: { form: any }) {
         description="Add a location for your event."
       />
       <CountrySelect form={form} setLocationValue={setLocationValue} />
-      <Map center={location?.latlng ?? undefined} />
+      <Map center={location?.latlng} key={location?.value} />
       <FormMessage>
         {form.formState.errors.location &&
           form.formState.errors.location.message}

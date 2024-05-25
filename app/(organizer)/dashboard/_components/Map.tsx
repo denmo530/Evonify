@@ -18,18 +18,20 @@ L.Icon.Default.mergeOptions({
 
 interface MapProps {
   center?: number[];
+  key: string;
 }
 
-export default function Map({ center }: MapProps) {
+export default function Map({ center, key }: MapProps) {
   return (
     <MapContainer
+      key={key || "default"}
       center={(center as L.LatLngExpression) || [51, -0.09]}
       zoom={center ? 4 : 2}
       scrollWheelZoom={false}
       className="h-[35vh] rounded-lg"
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      {center && <Marker position={center as L.LatLngExpression} />}
+      {/* {center && <Marker key={key} position={center as L.LatLngExpression} />} */}
     </MapContainer>
   );
 }

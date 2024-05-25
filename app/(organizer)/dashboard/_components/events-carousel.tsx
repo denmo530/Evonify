@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import EventCard from "./event-card";
 
 import {
@@ -14,7 +14,7 @@ import {
 import { Divide } from "lucide-react";
 
 export interface IEvent extends Doc<"events"> {
-  url: string;
+  urls: Id<"_storage">[];
 }
 
 export default function EventsCarousel({

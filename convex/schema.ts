@@ -6,13 +6,23 @@ export default defineSchema({
     name: v.string(),
     userId: v.id("users"),
     orgId: v.string(),
-    location: v.string(),
-    date: v.string(),
+    location: v.object({
+      latlng: v.array(v.number()),
+      region: v.string(),
+    }),
+    date: v.object({
+      from: v.string(),
+      to: v.optional(v.string()),
+    }),
     description: v.string(),
-    imgId: v.id("_storage"),
-    // imgIds: v.array(v.id("_storage")),
-    // category: v.string(),
-    // tags: v.array(v.string()),
+    imgIds: v.array(v.id("_storage")),
+    category: v.string(),
+    tags: v.array(v.string()),
+    time: v.object({
+      start: v.string(),
+      end: v.optional(v.string()),
+    }),
+    attendeeCount: v.optional(v.number()),
   }).index("by_orgId", ["orgId"]),
 
   users: defineTable({

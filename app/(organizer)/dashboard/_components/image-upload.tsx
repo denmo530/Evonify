@@ -50,6 +50,7 @@ export function ImageUpload({ form }: { form: any }) {
                   "image/*": [".jpg", ".jpeg", ".png", ".gif"],
                 }}
                 multiple
+                uploadImmediately
                 onUploadComplete={handleUploadComplete}
                 onUploadError={handleUploadError}
                 subtitle="Drag and drop your image here or click to browse."

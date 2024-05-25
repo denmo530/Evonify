@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 
 import {
   Card,
@@ -28,6 +28,7 @@ import Image from "next/image";
 import { DeleteDialog } from "./event-delete-dialog";
 import { EditDialog } from "./event-edit-dialog";
 import { ShareButton } from "./share-button";
+import { format } from "date-fns";
 
 export function EventCardActions({
   event,
@@ -39,7 +40,9 @@ export function EventCardActions({
 
   const { toast } = useToast();
 
-  const isDisabled = new Date(event.date) < new Date();
+  const isDisabled = event.date.to
+    ? new Date(event.date.to) < new Date()
+    : new Date(event.date.from) < new Date();
 
   return (
     <>
@@ -79,24 +82,27 @@ export function EventCardActions({
 export default function EventCard({
   event,
 }: {
-  event: Doc<"events"> & { url: string | null };
+  event: Doc<"events"> & { urls: Id<"_storage">[] };
 }) {
-  const date = new Date(event.date).toDateString();
-  const isDisabled = new Date(event.date) < new Date();
+  const date = `${format(new Date(event.date.from), "MMM d")}  ${event.date.to ? format(new Date(event.date?.to), "- MMM d") : ""}`;
+
+  const isDisabled = event.date.to
+    ? new Date(event.date.to) < new Date()
+    : new Date(event.date.from) < new Date();
 
   return (
     <Card className={`${isDisabled && "opacity-40"}`}>
       <CardHeader className="relative mb-4 ">
-        {event.url && (
+        {event.urls && (
           <div className="overflow-hidden h-16 object-contain">
-            <Image alt={event.name} fill src={event.url} />
+            <Image alt={event.name} fill src={event.urls[0]} />
           </div>
         )}
       </CardHeader>
       <CardContent className="space-y-2 prose relative">
         <div className="absolute top-2 right-2 flex gap-2 items-center">
-          <ShareButton event={event} />
-          <EventCardActions event={event} />
+          {/* <ShareButton event={event} />
+          <EventCardActions event={event} /> */}
         </div>
         <CardTitle className="text-lg">{event.name}</CardTitle>
         <div className="text-sm">
@@ -108,7 +114,7 @@ export default function EventCard({
       <CardFooter className="flex justify-between">
         <Button>Send Notification</Button>
         <div className="text-xs flex  items-end flex-col text-muted-foreground leading-relaxed ">
-          <p>{event.location}</p>
+          <p>{event.location.region}</p>
           <p>{date}</p>
         </div>
       </CardFooter>
