@@ -1,25 +1,18 @@
 "use client";
 
 import { useOrganization, useUser } from "@clerk/nextjs";
-import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
+import { usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 import React from "react";
 import CreateButton from "../_components/create-button";
 import Image from "next/image";
-import { Loader2, SlashIcon } from "lucide-react";
-import { SearchBar } from "../../../components/search-bar";
-import EventsCarousel from "../_components/events-carousel";
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+
 import { EventWizard } from "../_components/event-creation-wizard";
+import { IEvent } from "@/app/types";
+import Link from "next/link";
+import EventCard from "../_components/event-card";
 
 function Placeholder() {
   return (
@@ -38,27 +31,7 @@ function Placeholder() {
   );
 }
 
-function BreadCrumb() {
-  return (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator>
-          <SlashIcon />
-        </BreadcrumbSeparator>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/dashboard/events">Events</BreadcrumbLink>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  );
-}
-
 export default function Events() {
-  const [query, setQuery] = React.useState("");
-
   const user = useUser();
   const organization = useOrganization();
 
@@ -66,12 +39,6 @@ export default function Events() {
 
   if (organization.isLoaded && user.isLoaded)
     orgId = organization.organization?.id ?? user.user?.id;
-
-  const orgName =
-    organization.organization?.name ??
-    user.user?.username ??
-    user.user?.fullName ??
-    user.user?.primaryEmailAddress?.emailAddress;
 
   const {
     results: prevEvents,
@@ -95,7 +62,7 @@ export default function Events() {
     { initialNumItems: 5 }
   );
 
-  const isLoading = prevEventsLoading || activeEventsLoading;
+  const isLoading = activeEventsLoading || prevEventsLoading;
 
   return (
     <main className="container mx-auto pt-12">
@@ -108,51 +75,40 @@ export default function Events() {
 
       {!isLoading && (
         <>
-          <div className="mb-4">
-            <BreadCrumb />
-          </div>
           <div className="flex justify-between items-center mb-8">
-            <div className="space-y-1">
-              <h1 className="text-4xl font-bold">Your Events</h1>
-              <div className="text-muted-foreground text-sm px-2">
-                Organization{" "}
-                <span className="text-[#D4145A]">
-                  {orgName?.toLocaleUpperCase()}
-                </span>
-              </div>
+            <div className=" leading-relaxed space-y-2">
+              <h1 className="text-3xl font-bold">Your Events</h1>
+              <p className="text-muted-foreground text-sm">
+                Here you can create new events and manage your existing ones.
+              </p>
             </div>
-            {/* <CreateButton /> */}
             <EventWizard orgId={orgId} />
           </div>
-          {/* <SearchBar setQuery={setQuery} query={query} /> */}
 
           {activeEvents?.length === 0 && prevEvents.length === 0 && (
             <Placeholder />
           )}
 
-          <div className="mt-8 space-y-8">
-            {activeEvents && activeEvents.length > 0 && (
-              <div>
-                <EventsCarousel
-                  events={activeEvents}
-                  loadMore={() => loadMoreActiveEvents(1)}
-                  status={activeEventsStatus}
-                  heading="Active Events"
-                />
+          {activeEvents && activeEvents.length > 0 && (
+            <div className="space-y-2">
+              <h2 className="text-lg font-medium">Your Active Events</h2>
+              <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 ">
+                {activeEvents.map((event) => (
+                  <EventCard key={event._id} event={event as IEvent} />
+                ))}
               </div>
-            )}
-
-            {prevEvents && prevEvents.length > 0 && (
-              <div>
-                <EventsCarousel
-                  events={prevEvents}
-                  loadMore={() => loadMorePrevEvents(1)}
-                  status={prevEventsStatus}
-                  heading="Previous Events"
-                />
+            </div>
+          )}
+          {prevEvents && prevEvents.length > 0 && (
+            <div className="space-y-2">
+              <h2 className="text-lg font-medium">Your Past Events</h2>
+              <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
+                {prevEvents.map((event) => (
+                  <EventCard key={event._id} event={event as IEvent} />
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </>
       )}
     </main>

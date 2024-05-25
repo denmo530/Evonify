@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { Doc, Id } from "@/convex/_generated/dataModel";
 import EventCard from "./event-card";
+import { IEvent } from "../../../types";
 
 import {
   Carousel,
@@ -11,17 +11,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Divide } from "lucide-react";
-
-export interface IEvent extends Doc<"events"> {
-  urls: Id<"_storage">[];
-}
 
 export default function EventsCarousel({
   events,
   loadMore,
   status,
-  heading,
 }: {
   events: any;
   loadMore: (numItems: number) => void;
@@ -52,8 +46,7 @@ export default function EventsCarousel({
   };
 
   return (
-    <>
-      <h2 className="text-2xl font-semibold ml-8">{heading}</h2>
+    <div className="relative">
       <Carousel
         opts={{
           align: "start",
@@ -85,6 +78,6 @@ export default function EventsCarousel({
           </>
         )}
       </Carousel>
-    </>
+    </div>
   );
 }

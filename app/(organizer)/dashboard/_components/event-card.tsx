@@ -21,7 +21,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Edit, MoreVertical, Share2, TrashIcon } from "lucide-react";
+import {
+  CheckCircle2,
+  Edit,
+  Eye,
+  FileHeart,
+  Heart,
+  MoreVertical,
+  Share2,
+  TrashIcon,
+} from "lucide-react";
 
 import { useToast } from "@/components/ui/use-toast";
 import Image from "next/image";
@@ -29,16 +38,18 @@ import { DeleteDialog } from "./event-delete-dialog";
 import { EditDialog } from "./event-edit-dialog";
 import { ShareButton } from "./share-button";
 import { format } from "date-fns";
+import { IEvent } from "@/app/types";
+import { MdPeople, MdPeopleOutline } from "react-icons/md";
+import { FaEye } from "react-icons/fa";
+import { CardMetricItem } from "./event-card-metric-item";
 
-export function EventCardActions({
-  event,
-}: {
-  event: Doc<"events"> & { url: string | null };
-}) {
+interface EventCardActionsProps {
+  event: IEvent;
+}
+
+export function EventCardActions({ event }: EventCardActionsProps) {
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
-
-  const { toast } = useToast();
 
   const isDisabled = event.date.to
     ? new Date(event.date.to) < new Date()
@@ -51,7 +62,8 @@ export function EventCardActions({
         setOpen={setIsDeleteOpen}
         eventId={event._id}
       />
-      <EditDialog event={event} open={isEditOpen} setOpen={setIsEditOpen} />
+      {/* // TODO: Create Edit page */}
+      {/* <EditDialog event={event} open={isEditOpen} setOpen={setIsEditOpen} /> */}
       <DropdownMenu>
         <DropdownMenuTrigger>
           <MoreVertical className="h-5 w-5" />
@@ -79,11 +91,37 @@ export function EventCardActions({
   );
 }
 
-export default function EventCard({
-  event,
-}: {
-  event: Doc<"events"> & { urls: Id<"_storage">[] };
-}) {
+function CardMetrics() {
+  const metrics = [
+    {
+      icon: <Heart className="h-4 w-4" />,
+      value: "20",
+      description: "The number of people who have shown interest in this event",
+    },
+    {
+      icon: <CheckCircle2 className="h-4 w-4" />,
+      value: "20",
+      description:
+        "The number of people who have registered or RSVP'd for this event",
+    },
+    {
+      icon: <FaEye className="h-4 w-4" />,
+      value: "20",
+      description:
+        "The number of views or impressions this event page has received",
+    },
+  ];
+
+  return (
+    <div className="flex gap-4">
+      {metrics.map((metric, index) => (
+        <CardMetricItem key={index} {...metric} />
+      ))}
+    </div>
+  );
+}
+
+export default function EventCard({ event }: { event: IEvent }) {
   const date = `${format(new Date(event.date.from), "MMM d")}  ${event.date.to ? format(new Date(event.date?.to), "- MMM d") : ""}`;
 
   const isDisabled = event.date.to
@@ -94,15 +132,15 @@ export default function EventCard({
     <Card className={`${isDisabled && "opacity-40"}`}>
       <CardHeader className="relative mb-4 ">
         {event.urls && (
-          <div className="overflow-hidden h-16 object-contain">
+          <div className="rounded-md h-44 aspect-square relative overflow-hidden  mb-1 ">
             <Image alt={event.name} fill src={event.urls[0]} />
           </div>
         )}
       </CardHeader>
       <CardContent className="space-y-2 prose relative">
         <div className="absolute top-2 right-2 flex gap-2 items-center">
-          {/* <ShareButton event={event} />
-          <EventCardActions event={event} /> */}
+          <ShareButton event={event} />
+          <EventCardActions event={event} />
         </div>
         <CardTitle className="text-lg">{event.name}</CardTitle>
         <div className="text-sm">
@@ -112,9 +150,10 @@ export default function EventCard({
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button>Send Notification</Button>
+        <div className="flex gap-4">
+          <CardMetrics />
+        </div>
         <div className="text-xs flex  items-end flex-col text-muted-foreground leading-relaxed ">
-          <p>{event.location.region}</p>
           <p>{date}</p>
         </div>
       </CardFooter>

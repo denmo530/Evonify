@@ -7,15 +7,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Doc } from "@/convex/_generated/dataModel";
+import { IEvent } from "@/app/types";
 
 import { Facebook, Instagram, Link, Share2 } from "lucide-react";
 
-export function ShareButton({
-  event,
-}: {
-  event: Doc<"events"> & { url: string | null };
-}) {
-  const isDisabled = new Date(event.date) < new Date();
+interface ShareButtonProps {
+  event: IEvent;
+}
+
+export function ShareButton({ event }: ShareButtonProps) {
+  const isDisabled = false;
   return (
     <>
       <DropdownMenu>
