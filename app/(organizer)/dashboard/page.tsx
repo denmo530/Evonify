@@ -55,7 +55,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="container mx-auto pt-12 mb-8">
+    <main className="container mx-auto pt-12">
       <div className="flex justify-between items-center mb-8">
         <div className="space-y-1">
           <h1 className="text-4xl font-bold">
@@ -85,7 +85,7 @@ export default function DashboardPage() {
           </div>
           <div className="w-full sm:w-[35%] p-5">
             <div className="w-full flex justify-end gap-2">
-              <Link href={"/dashboard/write"}>
+              <Link href={"/dashboard/drafts"}>
                 <Button variant={"secondary"}>
                   <PenBox className="w-4 h-4 mr-1" />
                   Start Writing

@@ -122,7 +122,7 @@ export default function Events() {
               </div>
             </div>
             {/* <CreateButton /> */}
-            <EventWizard />
+            <EventWizard orgId={orgId} />
           </div>
           {/* <SearchBar setQuery={setQuery} query={query} /> */}
 
