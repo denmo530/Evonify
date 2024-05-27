@@ -41,17 +41,6 @@ export default function Events() {
     orgId = organization.organization?.id ?? user.user?.id;
 
   const {
-    results: prevEvents,
-    isLoading: prevEventsLoading,
-    status: prevEventsStatus,
-    loadMore: loadMorePrevEvents,
-  } = usePaginatedQuery(
-    api.events.getPrevEventsByUser,
-    orgId ? { orgId } : "skip",
-    { initialNumItems: 5 }
-  );
-
-  const {
     results: activeEvents,
     status: activeEventsStatus,
     isLoading: activeEventsLoading,
@@ -62,7 +51,7 @@ export default function Events() {
     { initialNumItems: 5 }
   );
 
-  const isLoading = activeEventsLoading || prevEventsLoading;
+  const isLoading = activeEventsLoading;
 
   return (
     <main className="container mx-auto pt-12">
@@ -85,25 +74,13 @@ export default function Events() {
             <EventWizard orgId={orgId} />
           </div>
 
-          {activeEvents?.length === 0 && prevEvents.length === 0 && (
-            <Placeholder />
-          )}
+          {activeEvents?.length === 0 && <Placeholder />}
 
           {activeEvents && activeEvents.length > 0 && (
             <div className="space-y-2">
-              <h2 className="text-lg font-medium">Your Active Events</h2>
+              <h2 className="text-lg font-medium">Your Events</h2>
               <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 ">
                 {activeEvents.map((event) => (
-                  <EventCard key={event._id} event={event as IEvent} />
-                ))}
-              </div>
-            </div>
-          )}
-          {prevEvents && prevEvents.length > 0 && (
-            <div className="space-y-2">
-              <h2 className="text-lg font-medium">Your Past Events</h2>
-              <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-                {prevEvents.map((event) => (
                   <EventCard key={event._id} event={event as IEvent} />
                 ))}
               </div>

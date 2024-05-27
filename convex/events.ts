@@ -24,9 +24,11 @@ export const getEventById = query({
       throw new ConvexError("event not found");
     }
 
-    const urls = event.imgIds.map(async (imgId) => {
-      return await ctx.storage.getUrl(imgId);
-    });
+    const urls = await Promise.all(
+      event.imgIds.map(async (imgId) => {
+        return await ctx.storage.getUrl(imgId);
+      })
+    );
 
     return { ...event, urls };
   },

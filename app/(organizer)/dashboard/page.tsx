@@ -58,7 +58,7 @@ export default function DashboardPage() {
     <main className="container mx-auto pt-12">
       <div className="flex justify-between items-center mb-8">
         <div className="space-y-1">
-          <h1 className="text-4xl font-bold">
+          <h1 className="text-red-300xl font-bold">
             Hello{" "}
             <span className="bg-gradient-to-r from-[#D4145A] via-[#FF5F6D] to-[#FBB03B] inline-block text-transparent bg-clip-text">
               {displayName} 👋
